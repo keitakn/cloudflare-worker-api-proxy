@@ -6,7 +6,7 @@ export const handleCatImageValidation = async (
     requestMethod: request.method,
   };
 
-  const jsonBody = JSON.stringify(responseBody, null, 2);
+  const jsonBody = JSON.stringify(responseBody);
 
   const headers = { 'Content-Type': 'application/json' };
 
@@ -16,7 +16,7 @@ export const handleCatImageValidation = async (
 export const handleNotFound = async (request: Request): Promise<Response> => {
   const responseBody = { message: `NotFound`, requestMethod: request.method };
 
-  const jsonBody = JSON.stringify(responseBody, null, 2);
+  const jsonBody = JSON.stringify(responseBody);
 
   const headers = { 'Content-Type': 'application/json' };
 
