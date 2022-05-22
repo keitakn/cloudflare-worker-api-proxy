@@ -1,3 +1,5 @@
+/* eslint-disable require-await */
+
 export const handleCatImageValidation = async (
   request: Request,
 ): Promise<Response> => {
