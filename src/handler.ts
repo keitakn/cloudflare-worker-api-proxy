@@ -1,11 +1,22 @@
 /* eslint-disable require-await */
 
+import { issueAccessToken } from './api/issueAccessToken';
+
 export const handleCatImageValidation = async (
   request: Request,
 ): Promise<Response> => {
+  const issueTokenRequest = {
+    endpoint: COGNITO_TOKEN_ENDPOINT,
+    cognitoClientId: COGNITO_CLIENT_ID,
+    cognitoClientSecret: COGNITO_CLIENT_SECRET,
+  };
+
+  const jwtAccessToken = await issueAccessToken(issueTokenRequest);
+
   const responseBody = {
     message: `Hello World!`,
     requestMethod: request.method,
+    jwtAccessTokenLength: jwtAccessToken.length,
   };
 
   const jsonBody = JSON.stringify(responseBody);
