@@ -9,6 +9,6 @@
  */
 import { router } from './router';
 
-addEventListener('fetch', (e) => {
-  e.respondWith(router.handle(e.request))
+addEventListener('fetch', (event) => {
+  event.respondWith(router.handle(event.request));
 });

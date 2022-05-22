@@ -1,8 +1,14 @@
-export const handleCatImageValidation = async (request: Request): Promise<Response> => {
+/* eslint-disable require-await */
 
-  const responseBody = { message: `Hello World!`, requestMethod: request.method };
+export const handleCatImageValidation = async (
+  request: Request,
+): Promise<Response> => {
+  const responseBody = {
+    message: `Hello World!`,
+    requestMethod: request.method,
+  };
 
-  const jsonBody = JSON.stringify(responseBody, null, 2);
+  const jsonBody = JSON.stringify(responseBody);
 
   const headers = { 'Content-Type': 'application/json' };
 
@@ -10,10 +16,9 @@ export const handleCatImageValidation = async (request: Request): Promise<Respon
 };
 
 export const handleNotFound = async (request: Request): Promise<Response> => {
-
   const responseBody = { message: `NotFound`, requestMethod: request.method };
 
-  const jsonBody = JSON.stringify(responseBody, null, 2);
+  const jsonBody = JSON.stringify(responseBody);
 
   const headers = { 'Content-Type': 'application/json' };
 
