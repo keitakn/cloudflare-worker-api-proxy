@@ -1,6 +1,10 @@
-export const handleCatImageValidation = async (request: Request): Promise<Response> => {
-
-  const responseBody = { message: `Hello World!`, requestMethod: request.method };
+export const handleCatImageValidation = async (
+  request: Request,
+): Promise<Response> => {
+  const responseBody = {
+    message: `Hello World!`,
+    requestMethod: request.method,
+  };
 
   const jsonBody = JSON.stringify(responseBody, null, 2);
 
@@ -10,7 +14,6 @@ export const handleCatImageValidation = async (request: Request): Promise<Respon
 };
 
 export const handleNotFound = async (request: Request): Promise<Response> => {
-
   const responseBody = { message: `NotFound`, requestMethod: request.method };
 
   const jsonBody = JSON.stringify(responseBody, null, 2);
