@@ -7,8 +7,8 @@
  *
  * Learn more at https://developers.cloudflare.com/workers/
  */
-import { handleRequest } from './handler'
+import { router } from './router';
 
-addEventListener('fetch', (event) => {
-  event.respondWith(handleRequest(event.request))
-})
+addEventListener('fetch', (e) => {
+  e.respondWith(router.handle(e.request))
+});
