@@ -105,6 +105,8 @@ module.exports = {
     'class-methods-use-this': 'off',
     'multiline-comment-style': 'off',
     'capitalized-comments': 'off',
+    'max-statements': ['error', 15],
+    'max-lines-per-function': ['error', 60],
   },
   settings: {
     'import/resolver': {
