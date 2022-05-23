@@ -1,6 +1,34 @@
 /* eslint-disable require-await */
 
 import { issueAccessToken } from './api/issueAccessToken';
+import { isFailureResult } from './result';
+
+const defaultSuccessStatus = 200;
+
+const defaultErrorStatus = 500;
+
+const createSuccessResponse = (
+  body: unknown,
+  statusCode = defaultSuccessStatus,
+): Response => {
+  const jsonBody = JSON.stringify(body);
+
+  const headers = { 'Content-Type': 'application/json' };
+
+  return new Response(jsonBody, { headers, status: statusCode });
+};
+
+type ErrorBody = {
+  title: string;
+  detail?: string;
+  type?: string | 'about:blank';
+  status?: number;
+};
+
+const createErrorResponse = (
+  body: ErrorBody,
+  statusCode = defaultErrorStatus,
+): Response => createSuccessResponse(body, statusCode);
 
 export const handleCatImageValidation = async (
   request: Request,
@@ -11,27 +39,35 @@ export const handleCatImageValidation = async (
     cognitoClientSecret: COGNITO_CLIENT_SECRET,
   };
 
-  const jwtAccessToken = await issueAccessToken(issueTokenRequest);
+  const issueAccessTokenResult = await issueAccessToken(issueTokenRequest);
+  if (isFailureResult(issueAccessTokenResult)) {
+    const status = 500;
+
+    const errorBody = {
+      title: 'issue_access_token_failed',
+      status,
+    };
+
+    return createErrorResponse(errorBody, status);
+  }
 
   const responseBody = {
     message: `Hello World!`,
     requestMethod: request.method,
-    jwtAccessTokenLength: jwtAccessToken.length,
+    jwtAccessTokenLength: issueAccessTokenResult.value.length,
   };
 
-  const jsonBody = JSON.stringify(responseBody);
-
-  const headers = { 'Content-Type': 'application/json' };
-
-  return new Response(jsonBody, { headers });
+  return createSuccessResponse(responseBody);
 };
 
 export const handleNotFound = async (request: Request): Promise<Response> => {
-  const responseBody = { message: `NotFound`, requestMethod: request.method };
+  const status = 404;
 
-  const jsonBody = JSON.stringify(responseBody);
+  const responseBody = {
+    title: `NotFound`,
+    detail: `requestMethod is ${request.method}`,
+    status,
+  };
 
-  const headers = { 'Content-Type': 'application/json' };
-
-  return new Response(jsonBody, { headers, status: 404 });
+  return createErrorResponse(responseBody, status);
 };
