@@ -13,7 +13,7 @@ type CognitoTokenResponseBody = {
   token_type: 'Bearer';
 };
 
-type JwtAccessToken = string;
+export type JwtAccessToken = string;
 
 export const issueAccessToken = async (
   request: IssueAccessTokenRequest,

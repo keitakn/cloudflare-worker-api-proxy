@@ -1,5 +1,6 @@
 /* eslint-disable require-await */
 
+import { isAcceptableCatImage } from './api/isAcceptableCatImage';
 import { issueAccessToken } from './api/issueAccessToken';
 import { isFailureResult } from './result';
 
@@ -41,21 +42,35 @@ export const handleCatImageValidation = async (
 
   const issueAccessTokenResult = await issueAccessToken(issueTokenRequest);
   if (isFailureResult(issueAccessTokenResult)) {
-    const status = 500;
-
     const errorBody = {
       title: 'issue_access_token_failed',
-      status,
+      status: defaultErrorStatus,
     };
 
-    return createErrorResponse(errorBody, status);
+    return createErrorResponse(errorBody, defaultErrorStatus);
   }
 
-  const responseBody = {
-    message: `Hello World!`,
-    requestMethod: request.method,
-    jwtAccessTokenLength: issueAccessTokenResult.value.length,
+  const body = await request.json();
+  const jsonRequestBody = JSON.stringify(body);
+
+  const isAcceptableCatImageRequest = {
+    accessToken: issueAccessTokenResult.value,
+    jsonRequestBody,
   };
+
+  const isAcceptableCatImageResult = await isAcceptableCatImage(
+    isAcceptableCatImageRequest,
+  );
+  if (isFailureResult(isAcceptableCatImageResult)) {
+    const errorBody = {
+      title: 'is_acceptable_cat_image_failed',
+      status: defaultErrorStatus,
+    };
+
+    return createErrorResponse(errorBody, defaultErrorStatus);
+  }
+
+  const responseBody = isAcceptableCatImageResult.value;
 
   return createSuccessResponse(responseBody);
 };
@@ -64,7 +79,7 @@ export const handleNotFound = async (request: Request): Promise<Response> => {
   const status = 404;
 
   const responseBody = {
-    title: `NotFound`,
+    title: `not_found`,
     detail: `requestMethod is ${request.method}`,
     status,
   };
