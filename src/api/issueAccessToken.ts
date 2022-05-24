@@ -15,9 +15,15 @@ type CognitoTokenResponseBody = {
 
 export type JwtAccessToken = string;
 
+type IssueAccessTokenResponse = {
+  jwtAccessToken: JwtAccessToken;
+  xRequestId?: string;
+  xLambdaRequestId?: string;
+};
+
 export const issueAccessToken = async (
   request: IssueAccessTokenRequest,
-): Promise<Result<JwtAccessToken, Error>> => {
+): Promise<Result<IssueAccessTokenResponse, Error>> => {
   const authorization = btoa(
     `${request.cognitoClientId}:${request.cognitoClientSecret}`,
   );
@@ -38,5 +44,9 @@ export const issueAccessToken = async (
 
   const responseBody = (await response.json()) as CognitoTokenResponseBody;
 
-  return createSuccessResult(responseBody.access_token);
+  const issueAccessTokenResponse = {
+    jwtAccessToken: responseBody.access_token,
+  };
+
+  return createSuccessResult(issueAccessTokenResponse);
 };

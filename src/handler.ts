@@ -54,7 +54,7 @@ export const handleCatImageValidation = async (
   const jsonRequestBody = JSON.stringify(body);
 
   const isAcceptableCatImageRequest = {
-    accessToken: issueAccessTokenResult.value,
+    accessToken: issueAccessTokenResult.value.jwtAccessToken,
     jsonRequestBody,
   };
 
@@ -70,7 +70,8 @@ export const handleCatImageValidation = async (
     return createErrorResponse(errorBody, defaultErrorStatus);
   }
 
-  const responseBody = isAcceptableCatImageResult.value;
+  const responseBody =
+    isAcceptableCatImageResult.value.isAcceptableCatImageResponse;
 
   return createSuccessResponse(responseBody);
 };

@@ -16,12 +16,24 @@ export type IsAcceptableCatImageNotAcceptableReason =
 
 export type IsAcceptableCatImageResponse = {
   isAcceptableCatImage: boolean;
-  notAcceptableReason: IsAcceptableCatImageNotAcceptableReason;
+  notAcceptableReason?: IsAcceptableCatImageNotAcceptableReason;
+};
+
+export type SuccessResponse = {
+  isAcceptableCatImageResponse: IsAcceptableCatImageResponse;
+  xRequestId?: string;
+  xLambdaRequestId?: string;
+};
+
+export type FailureResponse = {
+  error: Error;
+  xRequestId?: string;
+  xLambdaRequestId?: string;
 };
 
 export const isAcceptableCatImage = async (
   request: IsAcceptableCatImageRequest,
-): Promise<Result<IsAcceptableCatImageResponse, Error>> => {
+): Promise<Result<SuccessResponse, FailureResponse>> => {
   const options: RequestInit = {
     method: 'POST',
     headers: {
@@ -37,10 +49,40 @@ export const isAcceptableCatImage = async (
   );
 
   if (!response.ok) {
-    return createFailureResult(new Error('failed to isAcceptableCatImage'));
+    const failureResponse: FailureResponse = {
+      error: new Error('failed to isAcceptableCatImage'),
+    };
+
+    if (response.headers.get('x-request-id')) {
+      failureResponse.xRequestId = response.headers.get(
+        'x-request-id',
+      ) as string;
+    }
+
+    if (response.headers.get('x-lambda-request-id')) {
+      failureResponse.xLambdaRequestId = response.headers.get(
+        'x-lambda-request-id',
+      ) as string;
+    }
+
+    return createFailureResult<FailureResponse>(failureResponse);
   }
 
   const responseBody = (await response.json()) as IsAcceptableCatImageResponse;
 
-  return createSuccessResult<IsAcceptableCatImageResponse>(responseBody);
+  const successResponse: SuccessResponse = {
+    isAcceptableCatImageResponse: responseBody,
+  };
+
+  if (response.headers.get('x-request-id')) {
+    successResponse.xRequestId = response.headers.get('x-request-id') as string;
+  }
+
+  if (response.headers.get('x-lambda-request-id')) {
+    successResponse.xLambdaRequestId = response.headers.get(
+      'x-lambda-request-id',
+    ) as string;
+  }
+
+  return createSuccessResult<SuccessResponse>(successResponse);
 };
