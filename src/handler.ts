@@ -1,6 +1,40 @@
 /* eslint-disable require-await */
 
+import { isAcceptableCatImage } from './api/isAcceptableCatImage';
 import { issueAccessToken } from './api/issueAccessToken';
+import { isFailureResult } from './result';
+
+const defaultSuccessStatus = 200;
+
+const defaultErrorStatus = 500;
+
+type ResponseHeader = {
+  'Content-Type': 'application/json';
+  'X-Request-Id'?: string;
+  'X-Lambda-Request-Id'?: string;
+};
+
+const createSuccessResponse = (
+  body: unknown,
+  statusCode = defaultSuccessStatus,
+  headers: ResponseHeader = { 'Content-Type': 'application/json' },
+): Response => {
+  const jsonBody = JSON.stringify(body);
+
+  return new Response(jsonBody, { headers, status: statusCode });
+};
+
+type ErrorBody = {
+  title: string;
+  detail?: string;
+  type?: string | 'about:blank';
+  status?: number;
+};
+
+const createErrorResponse = (
+  body: ErrorBody,
+  statusCode = defaultErrorStatus,
+): Response => createSuccessResponse(body, statusCode);
 
 export const handleCatImageValidation = async (
   request: Request,
@@ -11,27 +45,63 @@ export const handleCatImageValidation = async (
     cognitoClientSecret: COGNITO_CLIENT_SECRET,
   };
 
-  const jwtAccessToken = await issueAccessToken(issueTokenRequest);
+  const issueAccessTokenResult = await issueAccessToken(issueTokenRequest);
+  if (isFailureResult(issueAccessTokenResult)) {
+    const errorBody = {
+      title: 'issue_access_token_failed',
+      status: defaultErrorStatus,
+    };
 
-  const responseBody = {
-    message: `Hello World!`,
-    requestMethod: request.method,
-    jwtAccessTokenLength: jwtAccessToken.length,
+    return createErrorResponse(errorBody, defaultErrorStatus);
+  }
+
+  const body = await request.json();
+  const jsonRequestBody = JSON.stringify(body);
+
+  const isAcceptableCatImageRequest = {
+    accessToken: issueAccessTokenResult.value.jwtAccessToken,
+    jsonRequestBody,
   };
 
-  const jsonBody = JSON.stringify(responseBody);
+  const isAcceptableCatImageResult = await isAcceptableCatImage(
+    isAcceptableCatImageRequest,
+  );
+  if (isFailureResult(isAcceptableCatImageResult)) {
+    const errorBody = {
+      title: 'is_acceptable_cat_image_failed',
+      status: defaultErrorStatus,
+    };
 
-  const headers = { 'Content-Type': 'application/json' };
+    return createErrorResponse(errorBody, defaultErrorStatus);
+  }
 
-  return new Response(jsonBody, { headers });
+  const responseBody =
+    isAcceptableCatImageResult.value.isAcceptableCatImageResponse;
+
+  const headers: ResponseHeader = {
+    'Content-Type': 'application/json',
+  };
+
+  if (isAcceptableCatImageResult.value.xRequestId) {
+    headers['X-Request-Id'] = isAcceptableCatImageResult.value.xRequestId;
+  }
+
+  if (isAcceptableCatImageResult.value.xLambdaRequestId) {
+    headers['X-Lambda-Request-Id'] =
+      isAcceptableCatImageResult.value.xLambdaRequestId;
+  }
+
+  return createSuccessResponse(responseBody, defaultSuccessStatus, headers);
 };
 
 export const handleNotFound = async (request: Request): Promise<Response> => {
-  const responseBody = { message: `NotFound`, requestMethod: request.method };
+  const status = 404;
 
-  const jsonBody = JSON.stringify(responseBody);
+  const responseBody = {
+    title: `not_found`,
+    detail: `requestMethod is ${request.method}`,
+    status,
+  };
 
-  const headers = { 'Content-Type': 'application/json' };
-
-  return new Response(jsonBody, { headers, status: 404 });
+  return createErrorResponse(responseBody, status);
 };
