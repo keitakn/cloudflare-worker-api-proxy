@@ -15,15 +15,17 @@ type CognitoTokenResponseBody = {
 
 export type JwtAccessToken = string;
 
-type IssueAccessTokenResponse = {
+type SuccessResponse = {
   jwtAccessToken: JwtAccessToken;
-  xRequestId?: string;
-  xLambdaRequestId?: string;
+};
+
+type FailureResponse = {
+  error: Error;
 };
 
 export const issueAccessToken = async (
   request: IssueAccessTokenRequest,
-): Promise<Result<IssueAccessTokenResponse, Error>> => {
+): Promise<Result<SuccessResponse, FailureResponse>> => {
   const authorization = btoa(
     `${request.cognitoClientId}:${request.cognitoClientSecret}`,
   );
@@ -39,7 +41,11 @@ export const issueAccessToken = async (
 
   const response = await fetch(request.endpoint, options);
   if (!response.ok) {
-    return createFailureResult(new Error('failed to issueAccessToken'));
+    const failureResponse = {
+      error: new Error('failed to issueAccessToken'),
+    };
+
+    return createFailureResult<FailureResponse>(failureResponse);
   }
 
   const responseBody = (await response.json()) as CognitoTokenResponseBody;
