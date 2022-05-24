@@ -8,13 +8,18 @@ const defaultSuccessStatus = 200;
 
 const defaultErrorStatus = 500;
 
+type ResponseHeader = {
+  'Content-Type': 'application/json';
+  'X-Request-Id'?: string;
+  'X-Lambda-Request-Id'?: string;
+};
+
 const createSuccessResponse = (
   body: unknown,
   statusCode = defaultSuccessStatus,
+  headers: ResponseHeader = { 'Content-Type': 'application/json' },
 ): Response => {
   const jsonBody = JSON.stringify(body);
-
-  const headers = { 'Content-Type': 'application/json' };
 
   return new Response(jsonBody, { headers, status: statusCode });
 };
@@ -73,7 +78,20 @@ export const handleCatImageValidation = async (
   const responseBody =
     isAcceptableCatImageResult.value.isAcceptableCatImageResponse;
 
-  return createSuccessResponse(responseBody);
+  const headers: ResponseHeader = {
+    'Content-Type': 'application/json',
+  };
+
+  if (isAcceptableCatImageResult.value.xRequestId) {
+    headers['X-Request-Id'] = isAcceptableCatImageResult.value.xRequestId;
+  }
+
+  if (isAcceptableCatImageResult.value.xLambdaRequestId) {
+    headers['X-Lambda-Request-Id'] =
+      isAcceptableCatImageResult.value.xLambdaRequestId;
+  }
+
+  return createSuccessResponse(responseBody, defaultSuccessStatus, headers);
 };
 
 export const handleNotFound = async (request: Request): Promise<Response> => {
