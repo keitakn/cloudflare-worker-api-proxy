@@ -105,7 +105,7 @@ module.exports = {
     'class-methods-use-this': 'off',
     'multiline-comment-style': 'off',
     'capitalized-comments': 'off',
-    'max-statements': ['error', 15],
+    'max-statements': ['error', 20],
     'max-lines-per-function': ['error', 60],
   },
   settings: {
