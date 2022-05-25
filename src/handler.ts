@@ -1,5 +1,6 @@
 /* eslint-disable require-await */
 
+import { fetchLgtmImagesInRandom } from './api/fetchLgtmImages';
 import { isAcceptableCatImage } from './api/isAcceptableCatImage';
 import { issueAccessToken } from './api/issueAccessToken';
 import { isFailureResult } from './result';
@@ -89,6 +90,58 @@ export const handleCatImageValidation = async (
   if (isAcceptableCatImageResult.value.xLambdaRequestId) {
     headers['X-Lambda-Request-Id'] =
       isAcceptableCatImageResult.value.xLambdaRequestId;
+  }
+
+  return createSuccessResponse(responseBody, defaultSuccessStatus, headers);
+};
+
+export const handleFetchLgtmImagesInRandom = async (): Promise<Response> => {
+  const issueTokenRequest = {
+    endpoint: COGNITO_TOKEN_ENDPOINT,
+    cognitoClientId: COGNITO_CLIENT_ID,
+    cognitoClientSecret: COGNITO_CLIENT_SECRET,
+  };
+
+  const issueAccessTokenResult = await issueAccessToken(issueTokenRequest);
+  if (isFailureResult(issueAccessTokenResult)) {
+    const errorBody = {
+      title: 'issue_access_token_failed',
+      status: defaultErrorStatus,
+    };
+
+    return createErrorResponse(errorBody, defaultErrorStatus);
+  }
+
+  const fetchLgtmImagesRequest = {
+    apiUrl: LGTMEOW_API_URL,
+    accessToken: issueAccessTokenResult.value.jwtAccessToken,
+  };
+
+  const fetchLgtmImagesResult = await fetchLgtmImagesInRandom(
+    fetchLgtmImagesRequest,
+  );
+  if (isFailureResult(fetchLgtmImagesResult)) {
+    const errorBody = {
+      title: 'fetch_lgtm_images_in_random_failed',
+      status: defaultErrorStatus,
+    };
+
+    return createErrorResponse(errorBody, defaultErrorStatus);
+  }
+
+  const responseBody = fetchLgtmImagesResult.value.lgtmImages;
+
+  const headers: ResponseHeader = {
+    'Content-Type': 'application/json',
+  };
+
+  if (fetchLgtmImagesResult.value.xRequestId) {
+    headers['X-Request-Id'] = fetchLgtmImagesResult.value.xRequestId;
+  }
+
+  if (fetchLgtmImagesResult.value.xLambdaRequestId) {
+    headers['X-Lambda-Request-Id'] =
+      fetchLgtmImagesResult.value.xLambdaRequestId;
   }
 
   return createSuccessResponse(responseBody, defaultSuccessStatus, headers);
