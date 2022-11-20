@@ -24,10 +24,10 @@ type FailureResponse = {
 };
 
 export const issueAccessToken = async (
-  request: IssueAccessTokenRequest,
+  request: IssueAccessTokenRequest
 ): Promise<Result<SuccessResponse, FailureResponse>> => {
   const authorization = btoa(
-    `${request.cognitoClientId}:${request.cognitoClientSecret}`,
+    `${request.cognitoClientId}:${request.cognitoClientSecret}`
   );
 
   const options = {
@@ -48,7 +48,7 @@ export const issueAccessToken = async (
     return createFailureResult<FailureResponse>(failureResponse);
   }
 
-  const responseBody = (await response.json()) as CognitoTokenResponseBody;
+  const responseBody = await response.json();
 
   const issueAccessTokenResponse = {
     jwtAccessToken: responseBody.access_token,

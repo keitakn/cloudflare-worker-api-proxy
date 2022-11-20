@@ -13,7 +13,7 @@ const mockInternalServerError: ResponseResolver<
     ctx.json({
       code: httpStatusCode.internalServerError,
       message: 'Internal Server Error',
-    }),
+    })
   );
 
 export default mockInternalServerError;

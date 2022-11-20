@@ -18,7 +18,7 @@ type ResponseHeader = {
 const createSuccessResponse = (
   body: unknown,
   statusCode = defaultSuccessStatus,
-  headers: ResponseHeader = { 'Content-Type': 'application/json' },
+  headers: ResponseHeader = { 'Content-Type': 'application/json' }
 ): Response => {
   const jsonBody = JSON.stringify(body);
 
@@ -34,11 +34,11 @@ type ErrorBody = {
 
 const createErrorResponse = (
   body: ErrorBody,
-  statusCode = defaultErrorStatus,
+  statusCode = defaultErrorStatus
 ): Response => createSuccessResponse(body, statusCode);
 
 export const handleCatImageValidation = async (
-  request: Request,
+  request: Request
 ): Promise<Response> => {
   const issueTokenRequest = {
     endpoint: COGNITO_TOKEN_ENDPOINT,
@@ -65,7 +65,7 @@ export const handleCatImageValidation = async (
   };
 
   const isAcceptableCatImageResult = await isAcceptableCatImage(
-    isAcceptableCatImageRequest,
+    isAcceptableCatImageRequest
   );
   if (isFailureResult(isAcceptableCatImageResult)) {
     const errorBody = {
@@ -118,7 +118,7 @@ export const handleFetchLgtmImagesInRandom = async (): Promise<Response> => {
   };
 
   const fetchLgtmImagesResult = await fetchLgtmImagesInRandom(
-    fetchLgtmImagesRequest,
+    fetchLgtmImagesRequest
   );
   if (isFailureResult(fetchLgtmImagesResult)) {
     const errorBody = {
