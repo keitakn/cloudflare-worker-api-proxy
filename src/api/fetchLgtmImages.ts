@@ -12,7 +12,7 @@ type FetchLgtmImagesRequest = {
 };
 
 type SuccessResponse = {
-  lgtmImages: LgtmImage[];
+  lgtmImages: LgtmImages;
   xRequestId?: string;
   xLambdaRequestId?: string;
 };
