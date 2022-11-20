@@ -39,13 +39,13 @@ export const fetchLgtmImagesInRandom = async (
       error: new Error('failed to fetchLgtmImagesInRandom'),
     };
 
-    if (response.headers.get('x-request-id')) {
+    if (response.headers.get('x-request-id') != null) {
       failureResponse.xRequestId = response.headers.get(
         'x-request-id'
       ) as string;
     }
 
-    if (response.headers.get('x-lambda-request-id')) {
+    if (response.headers.get('x-lambda-request-id') != null) {
       failureResponse.xLambdaRequestId = response.headers.get(
         'x-lambda-request-id'
       ) as string;
@@ -60,11 +60,11 @@ export const fetchLgtmImagesInRandom = async (
     lgtmImages: responseBody,
   };
 
-  if (response.headers.get('x-request-id')) {
+  if (response.headers.get('x-request-id') != null) {
     successResponse.xRequestId = response.headers.get('x-request-id') as string;
   }
 
-  if (response.headers.get('x-lambda-request-id')) {
+  if (response.headers.get('x-lambda-request-id') != null) {
     successResponse.xLambdaRequestId = response.headers.get(
       'x-lambda-request-id'
     ) as string;

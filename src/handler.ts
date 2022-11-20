@@ -83,11 +83,11 @@ export const handleCatImageValidation = async (
     'Content-Type': 'application/json',
   };
 
-  if (isAcceptableCatImageResult.value.xRequestId) {
+  if (isAcceptableCatImageResult.value.xRequestId != null) {
     headers['X-Request-Id'] = isAcceptableCatImageResult.value.xRequestId;
   }
 
-  if (isAcceptableCatImageResult.value.xLambdaRequestId) {
+  if (isAcceptableCatImageResult.value.xLambdaRequestId != null) {
     headers['X-Lambda-Request-Id'] =
       isAcceptableCatImageResult.value.xLambdaRequestId;
   }
@@ -135,11 +135,11 @@ export const handleFetchLgtmImagesInRandom = async (): Promise<Response> => {
     'Content-Type': 'application/json',
   };
 
-  if (fetchLgtmImagesResult.value.xRequestId) {
+  if (fetchLgtmImagesResult.value.xRequestId != null) {
     headers['X-Request-Id'] = fetchLgtmImagesResult.value.xRequestId;
   }
 
-  if (fetchLgtmImagesResult.value.xLambdaRequestId) {
+  if (fetchLgtmImagesResult.value.xLambdaRequestId != null) {
     headers['X-Lambda-Request-Id'] =
       fetchLgtmImagesResult.value.xLambdaRequestId;
   }
