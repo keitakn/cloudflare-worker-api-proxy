@@ -18,7 +18,7 @@ type ResponseHeader = {
 const createSuccessResponse = (
   body: unknown,
   statusCode = defaultSuccessStatus,
-  headers: ResponseHeader = { 'Content-Type': 'application/json' },
+  headers: ResponseHeader = { 'Content-Type': 'application/json' }
 ): Response => {
   const jsonBody = JSON.stringify(body);
 
@@ -34,11 +34,11 @@ type ErrorBody = {
 
 const createErrorResponse = (
   body: ErrorBody,
-  statusCode = defaultErrorStatus,
+  statusCode = defaultErrorStatus
 ): Response => createSuccessResponse(body, statusCode);
 
 export const handleCatImageValidation = async (
-  request: Request,
+  request: Request
 ): Promise<Response> => {
   const issueTokenRequest = {
     endpoint: COGNITO_TOKEN_ENDPOINT,
@@ -65,7 +65,7 @@ export const handleCatImageValidation = async (
   };
 
   const isAcceptableCatImageResult = await isAcceptableCatImage(
-    isAcceptableCatImageRequest,
+    isAcceptableCatImageRequest
   );
   if (isFailureResult(isAcceptableCatImageResult)) {
     const errorBody = {
@@ -83,11 +83,11 @@ export const handleCatImageValidation = async (
     'Content-Type': 'application/json',
   };
 
-  if (isAcceptableCatImageResult.value.xRequestId) {
+  if (isAcceptableCatImageResult.value.xRequestId != null) {
     headers['X-Request-Id'] = isAcceptableCatImageResult.value.xRequestId;
   }
 
-  if (isAcceptableCatImageResult.value.xLambdaRequestId) {
+  if (isAcceptableCatImageResult.value.xLambdaRequestId != null) {
     headers['X-Lambda-Request-Id'] =
       isAcceptableCatImageResult.value.xLambdaRequestId;
   }
@@ -118,7 +118,7 @@ export const handleFetchLgtmImagesInRandom = async (): Promise<Response> => {
   };
 
   const fetchLgtmImagesResult = await fetchLgtmImagesInRandom(
-    fetchLgtmImagesRequest,
+    fetchLgtmImagesRequest
   );
   if (isFailureResult(fetchLgtmImagesResult)) {
     const errorBody = {
@@ -135,11 +135,11 @@ export const handleFetchLgtmImagesInRandom = async (): Promise<Response> => {
     'Content-Type': 'application/json',
   };
 
-  if (fetchLgtmImagesResult.value.xRequestId) {
+  if (fetchLgtmImagesResult.value.xRequestId != null) {
     headers['X-Request-Id'] = fetchLgtmImagesResult.value.xRequestId;
   }
 
-  if (fetchLgtmImagesResult.value.xLambdaRequestId) {
+  if (fetchLgtmImagesResult.value.xLambdaRequestId != null) {
     headers['X-Lambda-Request-Id'] =
       fetchLgtmImagesResult.value.xLambdaRequestId;
   }
@@ -147,7 +147,7 @@ export const handleFetchLgtmImagesInRandom = async (): Promise<Response> => {
   return createSuccessResponse(responseBody, defaultSuccessStatus, headers);
 };
 
-export const handleNotFound = async (request: Request): Promise<Response> => {
+export const handleNotFound = (request: Request): Response => {
   const status = 404;
 
   const responseBody = {

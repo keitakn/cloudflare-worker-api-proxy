@@ -13,7 +13,7 @@ const mockFetchLgtmImages: ResponseResolver<
     ctx.set('Content-Type', 'application/json'),
     ctx.set('X-request-Id', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
     ctx.set('X-lambda-request-Id', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'),
-    ctx.json(fetchLgtmImagesMockBody),
+    ctx.json(fetchLgtmImagesMockBody)
   );
 
 export default mockFetchLgtmImages;

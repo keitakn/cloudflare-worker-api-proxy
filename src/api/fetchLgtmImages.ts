@@ -12,7 +12,7 @@ type FetchLgtmImagesRequest = {
 };
 
 type SuccessResponse = {
-  lgtmImages: LgtmImage[];
+  lgtmImages: LgtmImages;
   xRequestId?: string;
   xLambdaRequestId?: string;
 };
@@ -24,7 +24,7 @@ type FailureResponse = {
 };
 
 export const fetchLgtmImagesInRandom = async (
-  request: FetchLgtmImagesRequest,
+  request: FetchLgtmImagesRequest
 ): Promise<Result<SuccessResponse, FailureResponse>> => {
   const options = {
     method: 'GET',
@@ -39,34 +39,34 @@ export const fetchLgtmImagesInRandom = async (
       error: new Error('failed to fetchLgtmImagesInRandom'),
     };
 
-    if (response.headers.get('x-request-id')) {
+    if (response.headers.get('x-request-id') != null) {
       failureResponse.xRequestId = response.headers.get(
-        'x-request-id',
+        'x-request-id'
       ) as string;
     }
 
-    if (response.headers.get('x-lambda-request-id')) {
+    if (response.headers.get('x-lambda-request-id') != null) {
       failureResponse.xLambdaRequestId = response.headers.get(
-        'x-lambda-request-id',
+        'x-lambda-request-id'
       ) as string;
     }
 
     return createFailureResult<FailureResponse>(failureResponse);
   }
 
-  const responseBody = (await response.json()) as LgtmImages;
+  const responseBody = await response.json();
 
   const successResponse: SuccessResponse = {
     lgtmImages: responseBody,
   };
 
-  if (response.headers.get('x-request-id')) {
+  if (response.headers.get('x-request-id') != null) {
     successResponse.xRequestId = response.headers.get('x-request-id') as string;
   }
 
-  if (response.headers.get('x-lambda-request-id')) {
+  if (response.headers.get('x-lambda-request-id') != null) {
     successResponse.xLambdaRequestId = response.headers.get(
-      'x-lambda-request-id',
+      'x-lambda-request-id'
     ) as string;
   }
 

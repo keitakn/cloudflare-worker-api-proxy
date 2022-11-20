@@ -32,9 +32,9 @@ export type FailureResponse = {
 };
 
 export const isAcceptableCatImage = async (
-  request: IsAcceptableCatImageRequest,
+  request: IsAcceptableCatImageRequest
 ): Promise<Result<SuccessResponse, FailureResponse>> => {
-  const options: RequestInit = {
+  const options = {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${request.accessToken}`,
@@ -45,7 +45,7 @@ export const isAcceptableCatImage = async (
 
   const response = await fetch(
     `${IMAGE_RECOGNITION_API_URL}/cat-images/validation-results`,
-    options,
+    options
   );
 
   if (!response.ok) {
@@ -53,34 +53,34 @@ export const isAcceptableCatImage = async (
       error: new Error('failed to isAcceptableCatImage'),
     };
 
-    if (response.headers.get('x-request-id')) {
+    if (response.headers.get('x-request-id') != null) {
       failureResponse.xRequestId = response.headers.get(
-        'x-request-id',
+        'x-request-id'
       ) as string;
     }
 
-    if (response.headers.get('x-lambda-request-id')) {
+    if (response.headers.get('x-lambda-request-id') != null) {
       failureResponse.xLambdaRequestId = response.headers.get(
-        'x-lambda-request-id',
+        'x-lambda-request-id'
       ) as string;
     }
 
     return createFailureResult<FailureResponse>(failureResponse);
   }
 
-  const responseBody = (await response.json()) as IsAcceptableCatImageResponse;
+  const responseBody = await response.json();
 
   const successResponse: SuccessResponse = {
     isAcceptableCatImageResponse: responseBody,
   };
 
-  if (response.headers.get('x-request-id')) {
+  if (response.headers.get('x-request-id') != null) {
     successResponse.xRequestId = response.headers.get('x-request-id') as string;
   }
 
-  if (response.headers.get('x-lambda-request-id')) {
+  if (response.headers.get('x-lambda-request-id') != null) {
     successResponse.xLambdaRequestId = response.headers.get(
-      'x-lambda-request-id',
+      'x-lambda-request-id'
     ) as string;
   }
 
