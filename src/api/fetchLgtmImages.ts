@@ -26,7 +26,7 @@ type FailureResponse = {
 export const fetchLgtmImagesInRandom = async (
   request: FetchLgtmImagesRequest,
 ): Promise<Result<SuccessResponse, FailureResponse>> => {
-  const options: RequestInit = {
+  const options = {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${request.accessToken}`,
