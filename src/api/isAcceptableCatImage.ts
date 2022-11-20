@@ -34,7 +34,7 @@ export type FailureResponse = {
 export const isAcceptableCatImage = async (
   request: IsAcceptableCatImageRequest
 ): Promise<Result<SuccessResponse, FailureResponse>> => {
-  const options: RequestInit = {
+  const options = {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${request.accessToken}`,
