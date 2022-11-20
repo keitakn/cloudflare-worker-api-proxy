@@ -147,7 +147,7 @@ export const handleFetchLgtmImagesInRandom = async (): Promise<Response> => {
   return createSuccessResponse(responseBody, defaultSuccessStatus, headers);
 };
 
-export const handleNotFound = async (request: Request): Promise<Response> => {
+export const handleNotFound = (request: Request): Response => {
   const status = 404;
 
   const responseBody = {
