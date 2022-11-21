@@ -3,12 +3,12 @@ import { createFailureResult, createSuccessResult, Result } from '../result';
 import { validation } from '../validator';
 import { JwtAccessToken } from './issueAccessToken';
 
-type LgtmImage = { id: number; url: string };
+type LgtmImage = { id: string; url: string };
 
 type LgtmImages = LgtmImage[];
 
 const lgtmImageSchema = z.object({
-  id: z.number().min(1).max(Number.MAX_SAFE_INTEGER),
+  id: z.union([z.string().min(1), z.number().min(1)]),
   url: z.string().url(),
 });
 
