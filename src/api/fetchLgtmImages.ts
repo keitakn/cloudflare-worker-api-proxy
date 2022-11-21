@@ -70,6 +70,7 @@ export const fetchLgtmImagesInRandom = async (
 
   const responseBody = await response.json();
   if (isLgtmImages(responseBody)) {
+    // TODO idはnumber型で返すように変更する
     const successResponse: SuccessResponse = {
       lgtmImages: responseBody,
     };
