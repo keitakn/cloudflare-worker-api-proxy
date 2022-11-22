@@ -38,7 +38,6 @@
   },
   "dependencies": {
     "hono": "^2.5.4",
-    "itty-router": "^2.6.6",
     "zod": "^3.19.1"
   }
 }
