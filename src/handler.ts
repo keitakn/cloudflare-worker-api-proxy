@@ -1,5 +1,4 @@
 /* eslint-disable require-await */
-
 import { fetchLgtmImagesInRandom } from './api/fetchLgtmImages';
 import { isAcceptableCatImage } from './api/isAcceptableCatImage';
 import { issueAccessToken } from './api/issueAccessToken';
@@ -38,12 +37,18 @@ const createErrorResponse = (
 ): Response => createSuccessResponse(body, statusCode);
 
 export const handleCatImageValidation = async (
-  request: Request
+  env: {
+    cognitoTokenEndpoint: string;
+    cognitoClientId: string;
+    cognitoClientSecret: string;
+    apiUrl: string;
+  },
+  requestBody: { image: string; imageExtension: string }
 ): Promise<Response> => {
   const issueTokenRequest = {
-    endpoint: COGNITO_TOKEN_ENDPOINT,
-    cognitoClientId: COGNITO_CLIENT_ID,
-    cognitoClientSecret: COGNITO_CLIENT_SECRET,
+    endpoint: env.cognitoTokenEndpoint,
+    cognitoClientId: env.cognitoClientId,
+    cognitoClientSecret: env.cognitoClientSecret,
   };
 
   const issueAccessTokenResult = await issueAccessToken(issueTokenRequest);
@@ -56,8 +61,7 @@ export const handleCatImageValidation = async (
     return createErrorResponse(errorBody, defaultErrorStatus);
   }
 
-  const body = await request.json();
-  const jsonRequestBody = JSON.stringify(body);
+  const jsonRequestBody = JSON.stringify(requestBody);
 
   const isAcceptableCatImageRequest = {
     accessToken: issueAccessTokenResult.value.jwtAccessToken,
@@ -65,6 +69,7 @@ export const handleCatImageValidation = async (
   };
 
   const isAcceptableCatImageResult = await isAcceptableCatImage(
+    { apiUrl: env.apiUrl },
     isAcceptableCatImageRequest
   );
   if (isFailureResult(isAcceptableCatImageResult)) {
@@ -95,11 +100,16 @@ export const handleCatImageValidation = async (
   return createSuccessResponse(responseBody, defaultSuccessStatus, headers);
 };
 
-export const handleFetchLgtmImagesInRandom = async (): Promise<Response> => {
+export const handleFetchLgtmImagesInRandom = async (env: {
+  endpoint: string;
+  cognitoClientId: string;
+  cognitoClientSecret: string;
+  apiUrl: string;
+}): Promise<Response> => {
   const issueTokenRequest = {
-    endpoint: COGNITO_TOKEN_ENDPOINT,
-    cognitoClientId: COGNITO_CLIENT_ID,
-    cognitoClientSecret: COGNITO_CLIENT_SECRET,
+    endpoint: env.endpoint,
+    cognitoClientId: env.cognitoClientId,
+    cognitoClientSecret: env.cognitoClientSecret,
   };
 
   const issueAccessTokenResult = await issueAccessToken(issueTokenRequest);
@@ -113,7 +123,7 @@ export const handleFetchLgtmImagesInRandom = async (): Promise<Response> => {
   }
 
   const fetchLgtmImagesRequest = {
-    apiUrl: LGTMEOW_API_URL,
+    apiUrl: env.apiUrl,
     accessToken: issueAccessTokenResult.value.jwtAccessToken,
   };
 
@@ -147,12 +157,12 @@ export const handleFetchLgtmImagesInRandom = async (): Promise<Response> => {
   return createSuccessResponse(responseBody, defaultSuccessStatus, headers);
 };
 
-export const handleNotFound = (request: Request): Response => {
+export const handleNotFound = (request: { url: string }): Response => {
   const status = 404;
 
   const responseBody = {
     title: `not_found`,
-    detail: `requestMethod is ${request.method}`,
+    detail: `${request.url} is not found.`,
     status,
   };
 

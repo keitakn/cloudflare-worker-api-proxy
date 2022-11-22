@@ -50,6 +50,7 @@ export type FailureResponse = {
 };
 
 export const isAcceptableCatImage = async (
+  env: { apiUrl: string },
   request: IsAcceptableCatImageRequest
 ): Promise<Result<SuccessResponse, FailureResponse>> => {
   const options = {
@@ -62,7 +63,7 @@ export const isAcceptableCatImage = async (
   };
 
   const response = await fetch(
-    `${IMAGE_RECOGNITION_API_URL}/cat-images/validation-results`,
+    `${env.apiUrl}/cat-images/validation-results`,
     options
   );
 
