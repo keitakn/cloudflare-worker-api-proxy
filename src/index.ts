@@ -1,10 +1,8 @@
 import { Hono } from 'hono';
 import { Bindings } from './bindings';
-import {
-  handleCatImageValidation,
-  handleFetchLgtmImagesInRandom,
-  handleNotFound,
-} from './handler';
+import { handleCatImageValidation } from './handlers/handleCatImageValidation';
+import { handleFetchLgtmImagesInRandom } from './handlers/handleFetchLgtmImagesInRandom';
+import { handleNotFound } from './handlers/handleNotFound';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
