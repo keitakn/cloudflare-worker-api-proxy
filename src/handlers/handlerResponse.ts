@@ -16,7 +16,7 @@ export const createSuccessResponse = (
   return new Response(jsonBody, { headers, status: statusCode });
 };
 
-export type ErrorBody = {
+export type ProblemDetails = {
   title: string;
   type: 'ResourceNotFound' | 'ValidationError' | 'InternalServerError';
   status?: HttpStatusCode;
@@ -24,6 +24,6 @@ export type ErrorBody = {
 };
 
 export const createErrorResponse = (
-  body: ErrorBody,
+  problemDetails: ProblemDetails,
   statusCode: HttpStatusCode = httpStatusCode.internalServerError
-): Response => createSuccessResponse(body, statusCode);
+): Response => createSuccessResponse(problemDetails, statusCode);
