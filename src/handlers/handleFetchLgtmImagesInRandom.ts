@@ -34,7 +34,10 @@ export const handleFetchLgtmImagesInRandom = async (
       status: httpStatusCode.internalServerError,
     } as const;
 
-    return createErrorResponse(problemDetails, httpStatusCode.internalServerError);
+    return createErrorResponse(
+      problemDetails,
+      httpStatusCode.internalServerError
+    );
   }
 
   const fetchLgtmImagesRequest = {
@@ -52,7 +55,10 @@ export const handleFetchLgtmImagesInRandom = async (
       status: httpStatusCode.internalServerError,
     } as const;
 
-    return createErrorResponse(problemDetails, httpStatusCode.internalServerError);
+    return createErrorResponse(
+      problemDetails,
+      httpStatusCode.internalServerError
+    );
   }
 
   const responseBody = fetchLgtmImagesResult.value.lgtmImages;

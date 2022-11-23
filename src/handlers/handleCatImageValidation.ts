@@ -36,7 +36,10 @@ export const handleCatImageValidation = async (dto: Dto): Promise<Response> => {
       status: httpStatusCode.internalServerError,
     } as const;
 
-    return createErrorResponse(problemDetails, httpStatusCode.internalServerError);
+    return createErrorResponse(
+      problemDetails,
+      httpStatusCode.internalServerError
+    );
   }
 
   const jsonRequestBody = JSON.stringify(dto.requestBody);
@@ -57,7 +60,10 @@ export const handleCatImageValidation = async (dto: Dto): Promise<Response> => {
       status: httpStatusCode.internalServerError,
     } as const;
 
-    return createErrorResponse(problemDetails, httpStatusCode.internalServerError);
+    return createErrorResponse(
+      problemDetails,
+      httpStatusCode.internalServerError
+    );
   }
 
   const responseBody =
