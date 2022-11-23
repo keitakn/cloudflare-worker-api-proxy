@@ -5,7 +5,7 @@ type InvalidParam = {
   reason: string;
 };
 
-type InvalidParams = InvalidParam[];
+export type InvalidParams = InvalidParam[];
 
 export type ValidationResult = {
   isValidate: boolean;
