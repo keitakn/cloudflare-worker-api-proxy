@@ -29,9 +29,10 @@ export const handleFetchLgtmImagesInRandom = async (
   const issueAccessTokenResult = await issueAccessToken(issueTokenRequest);
   if (isFailureResult(issueAccessTokenResult)) {
     const errorBody = {
-      title: 'issue_access_token_failed',
+      title: 'failed to issue access token',
+      type: 'InternalServerError',
       status: httpStatusCode.internalServerError,
-    };
+    } as const;
 
     return createErrorResponse(errorBody, httpStatusCode.internalServerError);
   }
@@ -46,9 +47,10 @@ export const handleFetchLgtmImagesInRandom = async (
   );
   if (isFailureResult(fetchLgtmImagesResult)) {
     const errorBody = {
-      title: 'fetch_lgtm_images_in_random_failed',
+      title: 'failed to fetch lgtm images in random',
+      type: 'InternalServerError',
       status: httpStatusCode.internalServerError,
-    };
+    } as const;
 
     return createErrorResponse(errorBody, httpStatusCode.internalServerError);
   }

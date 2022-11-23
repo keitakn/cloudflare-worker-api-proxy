@@ -31,9 +31,10 @@ export const handleCatImageValidation = async (dto: Dto): Promise<Response> => {
   const issueAccessTokenResult = await issueAccessToken(issueTokenRequest);
   if (isFailureResult(issueAccessTokenResult)) {
     const errorBody = {
-      title: 'issue_access_token_failed',
+      title: 'failed to issue access token',
+      type: 'InternalServerError',
       status: httpStatusCode.internalServerError,
-    };
+    } as const;
 
     return createErrorResponse(errorBody, httpStatusCode.internalServerError);
   }
@@ -51,9 +52,10 @@ export const handleCatImageValidation = async (dto: Dto): Promise<Response> => {
   );
   if (isFailureResult(isAcceptableCatImageResult)) {
     const errorBody = {
-      title: 'is_acceptable_cat_image_failed',
+      title: 'failed to is acceptable cat image',
+      type: 'InternalServerError',
       status: httpStatusCode.internalServerError,
-    };
+    } as const;
 
     return createErrorResponse(errorBody, httpStatusCode.internalServerError);
   }

@@ -18,9 +18,9 @@ export const createSuccessResponse = (
 
 export type ErrorBody = {
   title: string;
+  type: 'ResourceNotFound' | 'ValidationError' | 'InternalServerError';
+  status?: HttpStatusCode;
   detail?: string;
-  type?: string | 'about:blank';
-  status?: number;
 };
 
 export const createErrorResponse = (

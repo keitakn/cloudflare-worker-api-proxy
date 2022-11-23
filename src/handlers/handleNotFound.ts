@@ -7,10 +7,11 @@ type Dto = {
 
 export const handleNotFound = (dto: Dto): Response => {
   const responseBody = {
-    title: `not_found`,
+    title: 'not found',
+    type: 'ResourceNotFound',
     detail: `${dto.url} is not found.`,
     status: httpStatusCode.notFound,
-  };
+  } as const;
 
   return createErrorResponse(responseBody, httpStatusCode.notFound);
 };
