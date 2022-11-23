@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { createFailureResult, createSuccessResult, Result } from '../result';
 import { validation } from '../validator';
 
-type IssueAccessTokenRequest = {
+type Dto = {
   endpoint: string;
   cognitoClientId: string;
   cognitoClientSecret: string;
@@ -38,10 +38,10 @@ type FailureResponse = {
 };
 
 export const issueAccessToken = async (
-  request: IssueAccessTokenRequest
+  dto: Dto
 ): Promise<Result<SuccessResponse, FailureResponse>> => {
   const authorization = btoa(
-    `${request.cognitoClientId}:${request.cognitoClientSecret}`
+    `${dto.cognitoClientId}:${dto.cognitoClientSecret}`
   );
 
   const options = {
@@ -53,7 +53,7 @@ export const issueAccessToken = async (
     body: 'grant_type=client_credentials&scope=api.lgtmeow/all image-recognition-api.lgtmeow/all',
   };
 
-  const response = await fetch(request.endpoint, options);
+  const response = await fetch(dto.endpoint, options);
   if (!response.ok) {
     const failureResponse = {
       error: new Error('failed to issueAccessToken'),

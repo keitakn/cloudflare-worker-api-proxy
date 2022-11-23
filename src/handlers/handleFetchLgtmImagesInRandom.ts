@@ -8,16 +8,22 @@ import {
   ResponseHeader,
 } from './handlerResponse';
 
-export const handleFetchLgtmImagesInRandom = async (env: {
-  endpoint: string;
-  cognitoClientId: string;
-  cognitoClientSecret: string;
-  apiUrl: string;
-}): Promise<Response> => {
+type Dto = {
+  env: {
+    cognitoTokenEndpoint: string;
+    cognitoClientId: string;
+    cognitoClientSecret: string;
+    apiBaseUrl: string;
+  };
+};
+
+export const handleFetchLgtmImagesInRandom = async (
+  dto: Dto
+): Promise<Response> => {
   const issueTokenRequest = {
-    endpoint: env.endpoint,
-    cognitoClientId: env.cognitoClientId,
-    cognitoClientSecret: env.cognitoClientSecret,
+    endpoint: dto.env.cognitoTokenEndpoint,
+    cognitoClientId: dto.env.cognitoClientId,
+    cognitoClientSecret: dto.env.cognitoClientSecret,
   };
 
   const issueAccessTokenResult = await issueAccessToken(issueTokenRequest);
@@ -31,7 +37,7 @@ export const handleFetchLgtmImagesInRandom = async (env: {
   }
 
   const fetchLgtmImagesRequest = {
-    apiUrl: env.apiUrl,
+    apiBaseUrl: dto.env.apiBaseUrl,
     accessToken: issueAccessTokenResult.value.jwtAccessToken,
   };
 

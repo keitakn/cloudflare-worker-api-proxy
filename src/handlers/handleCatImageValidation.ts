@@ -8,19 +8,24 @@ import {
   ResponseHeader,
 } from './handlerResponse';
 
-export const handleCatImageValidation = async (
+type Dto = {
   env: {
     cognitoTokenEndpoint: string;
     cognitoClientId: string;
     cognitoClientSecret: string;
-    apiUrl: string;
-  },
-  requestBody: { image: string; imageExtension: string }
-): Promise<Response> => {
+    apiBaseUrl: string;
+  };
+  requestBody: {
+    image: string;
+    imageExtension: string;
+  };
+};
+
+export const handleCatImageValidation = async (dto: Dto): Promise<Response> => {
   const issueTokenRequest = {
-    endpoint: env.cognitoTokenEndpoint,
-    cognitoClientId: env.cognitoClientId,
-    cognitoClientSecret: env.cognitoClientSecret,
+    endpoint: dto.env.cognitoTokenEndpoint,
+    cognitoClientId: dto.env.cognitoClientId,
+    cognitoClientSecret: dto.env.cognitoClientSecret,
   };
 
   const issueAccessTokenResult = await issueAccessToken(issueTokenRequest);
@@ -33,16 +38,16 @@ export const handleCatImageValidation = async (
     return createErrorResponse(errorBody, httpStatusCode.internalServerError);
   }
 
-  const jsonRequestBody = JSON.stringify(requestBody);
+  const jsonRequestBody = JSON.stringify(dto.requestBody);
 
-  const isAcceptableCatImageRequest = {
+  const isAcceptableCatImageDto = {
+    apiBaseUrl: dto.env.apiBaseUrl,
     accessToken: issueAccessTokenResult.value.jwtAccessToken,
     jsonRequestBody,
   };
 
   const isAcceptableCatImageResult = await isAcceptableCatImage(
-    { apiUrl: env.apiUrl },
-    isAcceptableCatImageRequest
+    isAcceptableCatImageDto
   );
   if (isFailureResult(isAcceptableCatImageResult)) {
     const errorBody = {

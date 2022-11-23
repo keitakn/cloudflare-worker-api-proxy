@@ -1,10 +1,14 @@
 import { httpStatusCode } from '../httpStatusCode';
 import { createErrorResponse } from './handlerResponse';
 
-export const handleNotFound = (request: { url: string }): Response => {
+type Dto = {
+  url: string;
+};
+
+export const handleNotFound = (dto: Dto): Response => {
   const responseBody = {
     title: `not_found`,
-    detail: `${request.url} is not found.`,
+    detail: `${dto.url} is not found.`,
     status: httpStatusCode.notFound,
   };
 

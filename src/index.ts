@@ -9,10 +9,12 @@ const app = new Hono<{ Bindings: Bindings }>();
 app.get('/lgtm-images', async (c) => {
   // TODO 環境変数のバリデーションを実施する
   return await handleFetchLgtmImagesInRandom({
-    endpoint: c.env.COGNITO_TOKEN_ENDPOINT,
-    cognitoClientId: c.env.COGNITO_CLIENT_ID,
-    cognitoClientSecret: c.env.COGNITO_CLIENT_SECRET,
-    apiUrl: c.env.LGTMEOW_API_URL,
+    env: {
+      cognitoTokenEndpoint: c.env.COGNITO_TOKEN_ENDPOINT,
+      cognitoClientId: c.env.COGNITO_CLIENT_ID,
+      cognitoClientSecret: c.env.COGNITO_CLIENT_SECRET,
+      apiBaseUrl: c.env.LGTMEOW_API_URL,
+    },
   });
 });
 
@@ -21,7 +23,7 @@ app.post('/cat-images/validation-results', async (c) => {
     cognitoTokenEndpoint: c.env.COGNITO_TOKEN_ENDPOINT,
     cognitoClientId: c.env.COGNITO_CLIENT_ID,
     cognitoClientSecret: c.env.COGNITO_CLIENT_SECRET,
-    apiUrl: c.env.IMAGE_RECOGNITION_API_URL,
+    apiBaseUrl: c.env.IMAGE_RECOGNITION_API_URL,
   };
 
   // TODO バリデーションを追加する
@@ -30,7 +32,7 @@ app.post('/cat-images/validation-results', async (c) => {
     imageExtension: string;
   }>();
 
-  return await handleCatImageValidation(env, requestBody);
+  return await handleCatImageValidation({ env, requestBody });
 });
 
 app.all('*', (c) => {

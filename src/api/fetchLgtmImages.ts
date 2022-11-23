@@ -20,8 +20,8 @@ const isLgtmImages = (value: unknown): value is LgtmImages => {
   return validation(lgtmImagesSchema, value).isValidate;
 };
 
-type FetchLgtmImagesRequest = {
-  apiUrl: string;
+type Dto = {
+  apiBaseUrl: string;
   accessToken: JwtAccessToken;
 };
 
@@ -38,16 +38,16 @@ type FailureResponse = {
 };
 
 export const fetchLgtmImagesInRandom = async (
-  request: FetchLgtmImagesRequest
+  dto: Dto
 ): Promise<Result<SuccessResponse, FailureResponse>> => {
   const options = {
     method: 'GET',
     headers: {
-      Authorization: `Bearer ${request.accessToken}`,
+      Authorization: `Bearer ${dto.accessToken}`,
     },
   };
 
-  const response = await fetch(`${request.apiUrl}/lgtm-images`, options);
+  const response = await fetch(`${dto.apiBaseUrl}/lgtm-images`, options);
   if (!response.ok) {
     const failureResponse: FailureResponse = {
       error: new Error('failed to fetchLgtmImagesInRandom'),

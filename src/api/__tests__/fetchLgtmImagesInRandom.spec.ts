@@ -40,7 +40,7 @@ describe('fetchLgtmImagesInRandom TestCases', () => {
     };
 
     const lgtmImagesResult = await fetchLgtmImagesInRandom({
-      apiUrl,
+      apiBaseUrl: apiUrl,
       accessToken: '',
     });
 
@@ -52,7 +52,7 @@ describe('fetchLgtmImagesInRandom TestCases', () => {
     mockServer.use(rest.get(`${apiUrl}/lgtm-images`, mockInternalServerError));
 
     const lgtmImagesResult = await fetchLgtmImagesInRandom({
-      apiUrl,
+      apiBaseUrl: apiUrl,
       accessToken: '',
     });
 

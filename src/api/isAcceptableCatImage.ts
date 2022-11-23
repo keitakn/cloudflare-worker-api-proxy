@@ -3,7 +3,8 @@ import { createFailureResult, createSuccessResult, Result } from '../result';
 import { validation } from '../validator';
 import type { JwtAccessToken } from './issueAccessToken';
 
-type IsAcceptableCatImageRequest = {
+type Dto = {
+  apiBaseUrl: string;
   accessToken: JwtAccessToken;
   jsonRequestBody: string;
 };
@@ -50,20 +51,19 @@ export type FailureResponse = {
 };
 
 export const isAcceptableCatImage = async (
-  env: { apiUrl: string },
-  request: IsAcceptableCatImageRequest
+  dto: Dto
 ): Promise<Result<SuccessResponse, FailureResponse>> => {
   const options = {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${request.accessToken}`,
+      Authorization: `Bearer ${dto.accessToken}`,
       'Content-Type': 'application/json',
     },
-    body: request.jsonRequestBody,
+    body: dto.jsonRequestBody,
   };
 
   const response = await fetch(
-    `${env.apiUrl}/cat-images/validation-results`,
+    `${dto.apiBaseUrl}/cat-images/validation-results`,
     options
   );
 
