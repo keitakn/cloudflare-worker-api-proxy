@@ -1,8 +1,11 @@
+import { z } from 'zod';
 import { isAcceptableCatImage } from '../api/isAcceptableCatImage';
 import { issueAccessToken } from '../api/issueAccessToken';
 import { httpStatusCode } from '../httpStatusCode';
 import type { AcceptedTypesImageExtension } from '../lgtmImage';
+import { acceptedTypesImageExtensions } from '../lgtmImage';
 import { isFailureResult } from '../result';
+import { validation, ValidationResult } from '../validator';
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -20,6 +23,17 @@ type Dto = {
     image: string;
     imageExtension: AcceptedTypesImageExtension;
   };
+};
+
+export const validateHandleCatImageValidationRequestBody = (
+  value: unknown
+): ValidationResult => {
+  const schema = z.object({
+    image: z.string().min(1),
+    imageExtension: z.enum(acceptedTypesImageExtensions),
+  });
+
+  return validation(schema, value);
 };
 
 export const handleCatImageValidation = async (dto: Dto): Promise<Response> => {

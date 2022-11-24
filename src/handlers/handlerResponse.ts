@@ -35,3 +35,19 @@ export const createErrorResponse = (
   problemDetails: ProblemDetails,
   statusCode: HttpStatusCode = httpStatusCode.internalServerError
 ): Response => createSuccessResponse(problemDetails, statusCode);
+
+export const createValidationErrorResponse = (
+  invalidParams: InvalidParams
+): Response => {
+  const validationProblemDetails = {
+    title: 'unprocessable entity',
+    type: 'ValidationError',
+    status: httpStatusCode.unprocessableEntity,
+    invalidParams,
+  } as const;
+
+  return createSuccessResponse(
+    validationProblemDetails,
+    httpStatusCode.unprocessableEntity
+  );
+};
