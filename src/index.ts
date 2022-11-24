@@ -3,6 +3,7 @@ import { Bindings } from './bindings';
 import { handleCatImageValidation } from './handlers/handleCatImageValidation';
 import { handleFetchLgtmImagesInRandom } from './handlers/handleFetchLgtmImagesInRandom';
 import { handleNotFound } from './handlers/handleNotFound';
+import { AcceptedTypesImageExtension } from './lgtmImage';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -29,7 +30,7 @@ app.post('/cat-images/validation-results', async (c) => {
   // TODO バリデーションを追加する
   const requestBody = await c.req.json<{
     image: string;
-    imageExtension: string;
+    imageExtension: AcceptedTypesImageExtension;
   }>();
 
   return await handleCatImageValidation({ env, requestBody });

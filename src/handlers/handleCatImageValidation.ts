@@ -1,6 +1,7 @@
 import { isAcceptableCatImage } from '../api/isAcceptableCatImage';
 import { issueAccessToken } from '../api/issueAccessToken';
 import { httpStatusCode } from '../httpStatusCode';
+import type { AcceptedTypesImageExtension } from '../lgtmImage';
 import { isFailureResult } from '../result';
 import {
   createErrorResponse,
@@ -17,7 +18,7 @@ type Dto = {
   };
   requestBody: {
     image: string;
-    imageExtension: string;
+    imageExtension: AcceptedTypesImageExtension;
   };
 };
 
