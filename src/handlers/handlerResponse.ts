@@ -1,4 +1,5 @@
 import { HttpStatusCode, httpStatusCode } from '../httpStatusCode';
+import { InvalidParams } from '../validator';
 
 export type ResponseHeader = {
   'Content-Type': 'application/json';
@@ -16,14 +17,37 @@ export const createSuccessResponse = (
   return new Response(jsonBody, { headers, status: statusCode });
 };
 
-export type ErrorBody = {
+export type ProblemDetails = {
   title: string;
+  type: 'ResourceNotFound' | 'InternalServerError';
+  status?: HttpStatusCode;
   detail?: string;
-  type?: string | 'about:blank';
-  status?: number;
+};
+
+export type ValidationProblemDetails = ProblemDetails & {
+  title: 'unprocessable entity';
+  type: 'ValidationError';
+  status: typeof httpStatusCode.unprocessableEntity;
+  invalidParams: InvalidParams;
 };
 
 export const createErrorResponse = (
-  body: ErrorBody,
+  problemDetails: ProblemDetails,
   statusCode: HttpStatusCode = httpStatusCode.internalServerError
-): Response => createSuccessResponse(body, statusCode);
+): Response => createSuccessResponse(problemDetails, statusCode);
+
+export const createValidationErrorResponse = (
+  invalidParams: InvalidParams
+): Response => {
+  const validationProblemDetails = {
+    title: 'unprocessable entity',
+    type: 'ValidationError',
+    status: httpStatusCode.unprocessableEntity,
+    invalidParams,
+  } as const;
+
+  return createSuccessResponse(
+    validationProblemDetails,
+    httpStatusCode.unprocessableEntity
+  );
+};

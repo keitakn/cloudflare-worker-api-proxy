@@ -1,8 +1,13 @@
 import { Hono } from 'hono';
 import { Bindings } from './bindings';
-import { handleCatImageValidation } from './handlers/handleCatImageValidation';
+import {
+  handleCatImageValidation,
+  validateHandleCatImageValidationRequestBody,
+} from './handlers/handleCatImageValidation';
 import { handleFetchLgtmImagesInRandom } from './handlers/handleFetchLgtmImagesInRandom';
 import { handleNotFound } from './handlers/handleNotFound';
+import { createValidationErrorResponse } from './handlers/handlerResponse';
+import { AcceptedTypesImageExtension } from './lgtmImage';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -29,8 +34,14 @@ app.post('/cat-images/validation-results', async (c) => {
   // TODO バリデーションを追加する
   const requestBody = await c.req.json<{
     image: string;
-    imageExtension: string;
+    imageExtension: AcceptedTypesImageExtension;
   }>();
+
+  const validationResult =
+    validateHandleCatImageValidationRequestBody(requestBody);
+  if (!validationResult.isValidate && validationResult.invalidParams != null) {
+    return createValidationErrorResponse(validationResult.invalidParams);
+  }
 
   return await handleCatImageValidation({ env, requestBody });
 });

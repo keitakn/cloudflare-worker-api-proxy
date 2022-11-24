@@ -1,7 +1,11 @@
+import { z } from 'zod';
 import { isAcceptableCatImage } from '../api/isAcceptableCatImage';
 import { issueAccessToken } from '../api/issueAccessToken';
 import { httpStatusCode } from '../httpStatusCode';
+import type { AcceptedTypesImageExtension } from '../lgtmImage';
+import { acceptedTypesImageExtensions } from '../lgtmImage';
 import { isFailureResult } from '../result';
+import { validation, ValidationResult } from '../validator';
 import {
   createErrorResponse,
   createSuccessResponse,
@@ -17,8 +21,19 @@ type Dto = {
   };
   requestBody: {
     image: string;
-    imageExtension: string;
+    imageExtension: AcceptedTypesImageExtension;
   };
+};
+
+export const validateHandleCatImageValidationRequestBody = (
+  value: unknown
+): ValidationResult => {
+  const schema = z.object({
+    image: z.string().min(1),
+    imageExtension: z.enum(acceptedTypesImageExtensions),
+  });
+
+  return validation(schema, value);
 };
 
 export const handleCatImageValidation = async (dto: Dto): Promise<Response> => {
@@ -30,12 +45,16 @@ export const handleCatImageValidation = async (dto: Dto): Promise<Response> => {
 
   const issueAccessTokenResult = await issueAccessToken(issueTokenRequest);
   if (isFailureResult(issueAccessTokenResult)) {
-    const errorBody = {
-      title: 'issue_access_token_failed',
+    const problemDetails = {
+      title: 'failed to issue access token',
+      type: 'InternalServerError',
       status: httpStatusCode.internalServerError,
-    };
+    } as const;
 
-    return createErrorResponse(errorBody, httpStatusCode.internalServerError);
+    return createErrorResponse(
+      problemDetails,
+      httpStatusCode.internalServerError
+    );
   }
 
   const jsonRequestBody = JSON.stringify(dto.requestBody);
@@ -50,12 +69,16 @@ export const handleCatImageValidation = async (dto: Dto): Promise<Response> => {
     isAcceptableCatImageDto
   );
   if (isFailureResult(isAcceptableCatImageResult)) {
-    const errorBody = {
-      title: 'is_acceptable_cat_image_failed',
+    const problemDetails = {
+      title: 'failed to is acceptable cat image',
+      type: 'InternalServerError',
       status: httpStatusCode.internalServerError,
-    };
+    } as const;
 
-    return createErrorResponse(errorBody, httpStatusCode.internalServerError);
+    return createErrorResponse(
+      problemDetails,
+      httpStatusCode.internalServerError
+    );
   }
 
   const responseBody =
