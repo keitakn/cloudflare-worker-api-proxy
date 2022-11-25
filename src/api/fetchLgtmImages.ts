@@ -2,7 +2,11 @@ import { z } from 'zod';
 import { createFailureResult, createSuccessResult, Result } from '../result';
 import { validation } from '../validator';
 import { JwtAccessToken } from './issueAccessToken';
-import { mightExtractRequestIds } from './mightExtractRequestIds';
+import {
+  LambdaRequestId,
+  mightExtractRequestIds,
+  RequestId,
+} from './mightExtractRequestIds';
 
 type LgtmImage = { id: string; url: string };
 
@@ -28,14 +32,14 @@ type Dto = {
 
 type SuccessResponse = {
   lgtmImages: LgtmImages;
-  xRequestId?: string;
-  xLambdaRequestId?: string;
+  xRequestId?: RequestId;
+  xLambdaRequestId?: LambdaRequestId;
 };
 
 type FailureResponse = {
   error: Error;
-  xRequestId?: string;
-  xLambdaRequestId?: string;
+  xRequestId?: RequestId;
+  xLambdaRequestId?: LambdaRequestId;
 };
 
 export const fetchLgtmImagesInRandom = async (

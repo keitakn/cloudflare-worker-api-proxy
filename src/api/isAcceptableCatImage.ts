@@ -2,7 +2,11 @@ import { z } from 'zod';
 import { createFailureResult, createSuccessResult, Result } from '../result';
 import { validation } from '../validator';
 import type { JwtAccessToken } from './issueAccessToken';
-import { mightExtractRequestIds } from './mightExtractRequestIds';
+import {
+  LambdaRequestId,
+  mightExtractRequestIds,
+  RequestId,
+} from './mightExtractRequestIds';
 
 type Dto = {
   apiBaseUrl: string;
@@ -41,14 +45,14 @@ const isAcceptableCatImageResponse = (
 
 export type SuccessResponse = {
   isAcceptableCatImageResponse: IsAcceptableCatImageResponse;
-  xRequestId?: string;
-  xLambdaRequestId?: string;
+  xRequestId?: RequestId;
+  xLambdaRequestId?: LambdaRequestId;
 };
 
 export type FailureResponse = {
   error: Error;
-  xRequestId?: string;
-  xLambdaRequestId?: string;
+  xRequestId?: RequestId;
+  xLambdaRequestId?: LambdaRequestId;
 };
 
 export const isAcceptableCatImage = async (
