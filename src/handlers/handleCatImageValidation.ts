@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { isAcceptableCatImage } from '../api/isAcceptableCatImage';
 import { issueAccessToken } from '../api/issueAccessToken';
+import { isValidationErrorResponse } from '../api/validationErrorResponse';
 import { httpStatusCode } from '../httpStatusCode';
 import type { AcceptedTypesImageExtension } from '../lgtmImage';
 import { acceptedTypesImageExtensions } from '../lgtmImage';
@@ -8,10 +9,10 @@ import { isFailureResult } from '../result';
 import { validation, ValidationResult } from '../validator';
 import {
   createErrorResponse,
-  createSuccessResponse, createValidationErrorResponse,
-  ResponseHeader, ValidationProblemDetails,
+  createSuccessResponse,
+  createValidationErrorResponse,
+  ResponseHeader,
 } from './handlerResponse';
-import {isValidationErrorResponse} from "../api/validationErrorResponse";
 
 type Dto = {
   env: {
@@ -84,8 +85,11 @@ export const handleCatImageValidation = async (dto: Dto): Promise<Response> => {
   }
 
   if (isFailureResult(isAcceptableCatImageResult)) {
-    if (isValidationErrorResponse(isAcceptableCatImageResult)) {
-      return createValidationErrorResponse(isAcceptableCatImageResult.invalidParams, headers);
+    if (isValidationErrorResponse(isAcceptableCatImageResult.value)) {
+      return createValidationErrorResponse(
+        isAcceptableCatImageResult.value.invalidParams,
+        headers
+      );
     }
 
     const problemDetails = {
@@ -97,7 +101,7 @@ export const handleCatImageValidation = async (dto: Dto): Promise<Response> => {
     return createErrorResponse(
       problemDetails,
       httpStatusCode.internalServerError,
-      headers,
+      headers
     );
   }
 

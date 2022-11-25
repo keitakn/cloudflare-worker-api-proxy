@@ -1,13 +1,14 @@
 import { fetchLgtmImagesInRandom } from '../api/fetchLgtmImages';
 import { issueAccessToken } from '../api/issueAccessToken';
+import { isValidationErrorResponse } from '../api/validationErrorResponse';
 import { httpStatusCode } from '../httpStatusCode';
 import { isFailureResult } from '../result';
 import {
   createErrorResponse,
-  createSuccessResponse, createValidationErrorResponse,
+  createSuccessResponse,
+  createValidationErrorResponse,
   ResponseHeader,
 } from './handlerResponse';
-import {isValidationErrorResponse} from "../api/validationErrorResponse";
 
 type Dto = {
   env: {
@@ -64,8 +65,11 @@ export const handleFetchLgtmImagesInRandom = async (
   }
 
   if (isFailureResult(fetchLgtmImagesResult)) {
-    if (isValidationErrorResponse(fetchLgtmImagesResult)) {
-      return createValidationErrorResponse(fetchLgtmImagesResult.invalidParams, headers);
+    if (isValidationErrorResponse(fetchLgtmImagesResult.value)) {
+      return createValidationErrorResponse(
+        fetchLgtmImagesResult.value.invalidParams,
+        headers
+      );
     }
 
     const problemDetails = {
