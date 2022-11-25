@@ -7,6 +7,10 @@ import {
   mightExtractRequestIds,
   RequestId,
 } from './mightExtractRequestIds';
+import {
+  createValidationErrorResponse,
+  ValidationErrorResponse,
+} from './validationErrorResponse';
 
 type LgtmImage = { id: string; url: string };
 
@@ -44,7 +48,9 @@ type FailureResponse = {
 
 export const fetchLgtmImagesInRandom = async (
   dto: Dto
-): Promise<Result<SuccessResponse, FailureResponse>> => {
+): Promise<
+  Result<SuccessResponse, FailureResponse | ValidationErrorResponse>
+> => {
   const options = {
     method: 'GET',
     headers: {
@@ -81,7 +87,13 @@ export const fetchLgtmImagesInRandom = async (
     });
   }
 
-  // TODO 後でバリデーション専用のエラーレスポンスを返すようにする
+  const validationResult = validation(lgtmImagesSchema, responseBody);
+  if (!validationResult.isValidate && validationResult.invalidParams != null) {
+    return createFailureResult<ValidationErrorResponse>(
+      createValidationErrorResponse(validationResult.invalidParams, response)
+    );
+  }
+
   const failureResponse: FailureResponse = {
     error: new Error('response body is invalid'),
   };

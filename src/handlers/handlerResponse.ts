@@ -33,11 +33,13 @@ export type ValidationProblemDetails = ProblemDetails & {
 
 export const createErrorResponse = (
   problemDetails: ProblemDetails,
-  statusCode: HttpStatusCode = httpStatusCode.internalServerError
-): Response => createSuccessResponse(problemDetails, statusCode);
+  statusCode: HttpStatusCode = httpStatusCode.internalServerError,
+  headers: ResponseHeader = { 'Content-Type': 'application/json' },
+): Response => createSuccessResponse(problemDetails, statusCode, headers);
 
 export const createValidationErrorResponse = (
-  invalidParams: InvalidParams
+  invalidParams: InvalidParams,
+  headers: ResponseHeader = { 'Content-Type': 'application/json' },
 ): Response => {
   const validationProblemDetails = {
     title: 'unprocessable entity',
@@ -48,6 +50,7 @@ export const createValidationErrorResponse = (
 
   return createSuccessResponse(
     validationProblemDetails,
-    httpStatusCode.unprocessableEntity
+    httpStatusCode.unprocessableEntity,
+    headers,
   );
 };

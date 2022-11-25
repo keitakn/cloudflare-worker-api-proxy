@@ -7,6 +7,10 @@ import {
   mightExtractRequestIds,
   RequestId,
 } from './mightExtractRequestIds';
+import {
+  createValidationErrorResponse,
+  ValidationErrorResponse,
+} from './validationErrorResponse';
 
 type Dto = {
   apiBaseUrl: string;
@@ -57,7 +61,9 @@ export type FailureResponse = {
 
 export const isAcceptableCatImage = async (
   dto: Dto
-): Promise<Result<SuccessResponse, FailureResponse>> => {
+): Promise<
+  Result<SuccessResponse, FailureResponse | ValidationErrorResponse>
+> => {
   const options = {
     method: 'POST',
     headers: {
@@ -100,7 +106,16 @@ export const isAcceptableCatImage = async (
     });
   }
 
-  // TODO 後でバリデーション専用のエラーレスポンスを返すようにする
+  const validationResult = validation(
+    isAcceptableCatImageResponseSchema,
+    responseBody
+  );
+  if (!validationResult.isValidate && validationResult.invalidParams != null) {
+    return createFailureResult<ValidationErrorResponse>(
+      createValidationErrorResponse(validationResult.invalidParams, response)
+    );
+  }
+
   const failureResponse: FailureResponse = {
     error: new Error('response body is invalid'),
   };

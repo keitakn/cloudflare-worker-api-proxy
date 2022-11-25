@@ -8,9 +8,10 @@ import { isFailureResult } from '../result';
 import { validation, ValidationResult } from '../validator';
 import {
   createErrorResponse,
-  createSuccessResponse,
-  ResponseHeader,
+  createSuccessResponse, createValidationErrorResponse,
+  ResponseHeader, ValidationProblemDetails,
 } from './handlerResponse';
+import {isValidationErrorResponse} from "../api/validationErrorResponse";
 
 type Dto = {
   env: {
@@ -68,21 +69,6 @@ export const handleCatImageValidation = async (dto: Dto): Promise<Response> => {
   const isAcceptableCatImageResult = await isAcceptableCatImage(
     isAcceptableCatImageDto
   );
-  if (isFailureResult(isAcceptableCatImageResult)) {
-    const problemDetails = {
-      title: 'failed to is acceptable cat image',
-      type: 'InternalServerError',
-      status: httpStatusCode.internalServerError,
-    } as const;
-
-    return createErrorResponse(
-      problemDetails,
-      httpStatusCode.internalServerError
-    );
-  }
-
-  const responseBody =
-    isAcceptableCatImageResult.value.isAcceptableCatImageResponse;
 
   const headers: ResponseHeader = {
     'Content-Type': 'application/json',
@@ -96,6 +82,27 @@ export const handleCatImageValidation = async (dto: Dto): Promise<Response> => {
     headers['X-Lambda-Request-Id'] =
       isAcceptableCatImageResult.value.xLambdaRequestId;
   }
+
+  if (isFailureResult(isAcceptableCatImageResult)) {
+    if (isValidationErrorResponse(isAcceptableCatImageResult)) {
+      return createValidationErrorResponse(isAcceptableCatImageResult.invalidParams, headers);
+    }
+
+    const problemDetails = {
+      title: 'failed to is acceptable cat image',
+      type: 'InternalServerError',
+      status: httpStatusCode.internalServerError,
+    } as const;
+
+    return createErrorResponse(
+      problemDetails,
+      httpStatusCode.internalServerError,
+      headers,
+    );
+  }
+
+  const responseBody =
+    isAcceptableCatImageResult.value.isAcceptableCatImageResponse;
 
   return createSuccessResponse(responseBody, httpStatusCode.ok, headers);
 };

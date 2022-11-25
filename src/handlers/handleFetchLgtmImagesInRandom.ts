@@ -4,9 +4,10 @@ import { httpStatusCode } from '../httpStatusCode';
 import { isFailureResult } from '../result';
 import {
   createErrorResponse,
-  createSuccessResponse,
+  createSuccessResponse, createValidationErrorResponse,
   ResponseHeader,
 } from './handlerResponse';
+import {isValidationErrorResponse} from "../api/validationErrorResponse";
 
 type Dto = {
   env: {
@@ -48,20 +49,6 @@ export const handleFetchLgtmImagesInRandom = async (
   const fetchLgtmImagesResult = await fetchLgtmImagesInRandom(
     fetchLgtmImagesRequest
   );
-  if (isFailureResult(fetchLgtmImagesResult)) {
-    const problemDetails = {
-      title: 'failed to fetch lgtm images in random',
-      type: 'InternalServerError',
-      status: httpStatusCode.internalServerError,
-    } as const;
-
-    return createErrorResponse(
-      problemDetails,
-      httpStatusCode.internalServerError
-    );
-  }
-
-  const responseBody = fetchLgtmImagesResult.value.lgtmImages;
 
   const headers: ResponseHeader = {
     'Content-Type': 'application/json',
@@ -75,6 +62,25 @@ export const handleFetchLgtmImagesInRandom = async (
     headers['X-Lambda-Request-Id'] =
       fetchLgtmImagesResult.value.xLambdaRequestId;
   }
+
+  if (isFailureResult(fetchLgtmImagesResult)) {
+    if (isValidationErrorResponse(fetchLgtmImagesResult)) {
+      return createValidationErrorResponse(fetchLgtmImagesResult.invalidParams, headers);
+    }
+
+    const problemDetails = {
+      title: 'failed to fetch lgtm images in random',
+      type: 'InternalServerError',
+      status: httpStatusCode.internalServerError,
+    } as const;
+
+    return createErrorResponse(
+      problemDetails,
+      httpStatusCode.internalServerError
+    );
+  }
+
+  const responseBody = fetchLgtmImagesResult.value.lgtmImages;
 
   return createSuccessResponse(responseBody, httpStatusCode.ok, headers);
 };
