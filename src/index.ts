@@ -12,7 +12,6 @@ import { AcceptedTypesImageExtension } from './lgtmImage';
 const app = new Hono<{ Bindings: Bindings }>();
 
 app.get('/lgtm-images', async (c) => {
-  // TODO 環境変数のバリデーションを実施する
   return await handleFetchLgtmImagesInRandom({
     env: {
       cognitoTokenEndpoint: c.env.COGNITO_TOKEN_ENDPOINT,
@@ -31,7 +30,6 @@ app.post('/cat-images/validation-results', async (c) => {
     apiBaseUrl: c.env.IMAGE_RECOGNITION_API_URL,
   };
 
-  // TODO バリデーションを追加する
   const requestBody = await c.req.json<{
     image: string;
     imageExtension: AcceptedTypesImageExtension;
