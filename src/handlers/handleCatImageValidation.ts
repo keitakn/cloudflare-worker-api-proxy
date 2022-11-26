@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { isAcceptableCatImage } from '../api/isAcceptableCatImage';
 import { issueAccessToken } from '../api/issueAccessToken';
+import { isValidationErrorResponse } from '../api/validationErrorResponse';
 import { httpStatusCode } from '../httpStatusCode';
 import type { AcceptedTypesImageExtension } from '../lgtmImage';
 import { acceptedTypesImageExtensions } from '../lgtmImage';
@@ -9,6 +10,7 @@ import { validation, ValidationResult } from '../validator';
 import {
   createErrorResponse,
   createSuccessResponse,
+  createValidationErrorResponse,
   ResponseHeader,
 } from './handlerResponse';
 
@@ -68,21 +70,6 @@ export const handleCatImageValidation = async (dto: Dto): Promise<Response> => {
   const isAcceptableCatImageResult = await isAcceptableCatImage(
     isAcceptableCatImageDto
   );
-  if (isFailureResult(isAcceptableCatImageResult)) {
-    const problemDetails = {
-      title: 'failed to is acceptable cat image',
-      type: 'InternalServerError',
-      status: httpStatusCode.internalServerError,
-    } as const;
-
-    return createErrorResponse(
-      problemDetails,
-      httpStatusCode.internalServerError
-    );
-  }
-
-  const responseBody =
-    isAcceptableCatImageResult.value.isAcceptableCatImageResponse;
 
   const headers: ResponseHeader = {
     'Content-Type': 'application/json',
@@ -96,6 +83,30 @@ export const handleCatImageValidation = async (dto: Dto): Promise<Response> => {
     headers['X-Lambda-Request-Id'] =
       isAcceptableCatImageResult.value.xLambdaRequestId;
   }
+
+  if (isFailureResult(isAcceptableCatImageResult)) {
+    if (isValidationErrorResponse(isAcceptableCatImageResult.value)) {
+      return createValidationErrorResponse(
+        isAcceptableCatImageResult.value.invalidParams,
+        headers
+      );
+    }
+
+    const problemDetails = {
+      title: 'failed to is acceptable cat image',
+      type: 'InternalServerError',
+      status: httpStatusCode.internalServerError,
+    } as const;
+
+    return createErrorResponse(
+      problemDetails,
+      httpStatusCode.internalServerError,
+      headers
+    );
+  }
+
+  const responseBody =
+    isAcceptableCatImageResult.value.isAcceptableCatImageResponse;
 
   return createSuccessResponse(responseBody, httpStatusCode.ok, headers);
 };

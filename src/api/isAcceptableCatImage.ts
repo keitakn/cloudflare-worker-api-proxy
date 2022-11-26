@@ -2,6 +2,15 @@ import { z } from 'zod';
 import { createFailureResult, createSuccessResult, Result } from '../result';
 import { validation } from '../validator';
 import type { JwtAccessToken } from './issueAccessToken';
+import {
+  LambdaRequestId,
+  mightExtractRequestIds,
+  RequestId,
+} from './mightExtractRequestIds';
+import {
+  createValidationErrorResponse,
+  ValidationErrorResponse,
+} from './validationErrorResponse';
 
 type Dto = {
   apiBaseUrl: string;
@@ -40,19 +49,21 @@ const isAcceptableCatImageResponse = (
 
 export type SuccessResponse = {
   isAcceptableCatImageResponse: IsAcceptableCatImageResponse;
-  xRequestId?: string;
-  xLambdaRequestId?: string;
+  xRequestId?: RequestId;
+  xLambdaRequestId?: LambdaRequestId;
 };
 
 export type FailureResponse = {
   error: Error;
-  xRequestId?: string;
-  xLambdaRequestId?: string;
+  xRequestId?: RequestId;
+  xLambdaRequestId?: LambdaRequestId;
 };
 
 export const isAcceptableCatImage = async (
   dto: Dto
-): Promise<Result<SuccessResponse, FailureResponse>> => {
+): Promise<
+  Result<SuccessResponse, FailureResponse | ValidationErrorResponse>
+> => {
   const options = {
     method: 'POST',
     headers: {
@@ -72,19 +83,12 @@ export const isAcceptableCatImage = async (
       error: new Error('failed to isAcceptableCatImage'),
     };
 
-    if (response.headers.get('x-request-id') != null) {
-      failureResponse.xRequestId = response.headers.get(
-        'x-request-id'
-      ) as string;
-    }
+    const requestIds = mightExtractRequestIds(response);
 
-    if (response.headers.get('x-lambda-request-id') != null) {
-      failureResponse.xLambdaRequestId = response.headers.get(
-        'x-lambda-request-id'
-      ) as string;
-    }
-
-    return createFailureResult<FailureResponse>(failureResponse);
+    return createFailureResult<FailureResponse>({
+      ...failureResponse,
+      ...requestIds,
+    });
   }
 
   const responseBody = await response.json();
@@ -94,35 +98,32 @@ export const isAcceptableCatImage = async (
       isAcceptableCatImageResponse: responseBody,
     };
 
-    if (response.headers.get('x-request-id') != null) {
-      successResponse.xRequestId = response.headers.get(
-        'x-request-id'
-      ) as string;
-    }
+    const requestIds = mightExtractRequestIds(response);
 
-    if (response.headers.get('x-lambda-request-id') != null) {
-      successResponse.xLambdaRequestId = response.headers.get(
-        'x-lambda-request-id'
-      ) as string;
-    }
-
-    return createSuccessResult<SuccessResponse>(successResponse);
+    return createSuccessResult<SuccessResponse>({
+      ...successResponse,
+      ...requestIds,
+    });
   }
 
-  // TODO 後でバリデーション専用のエラーレスポンスを返すようにする
+  const validationResult = validation(
+    isAcceptableCatImageResponseSchema,
+    responseBody
+  );
+  if (!validationResult.isValidate && validationResult.invalidParams != null) {
+    return createFailureResult<ValidationErrorResponse>(
+      createValidationErrorResponse(validationResult.invalidParams, response)
+    );
+  }
+
   const failureResponse: FailureResponse = {
     error: new Error('response body is invalid'),
   };
 
-  if (response.headers.get('x-request-id') != null) {
-    failureResponse.xRequestId = response.headers.get('x-request-id') as string;
-  }
+  const requestIds = mightExtractRequestIds(response);
 
-  if (response.headers.get('x-lambda-request-id') != null) {
-    failureResponse.xLambdaRequestId = response.headers.get(
-      'x-lambda-request-id'
-    ) as string;
-  }
-
-  return createFailureResult<FailureResponse>(failureResponse);
+  return createFailureResult<FailureResponse>({
+    ...failureResponse,
+    ...requestIds,
+  });
 };

@@ -2,6 +2,15 @@ import { z } from 'zod';
 import { createFailureResult, createSuccessResult, Result } from '../result';
 import { validation } from '../validator';
 import { JwtAccessToken } from './issueAccessToken';
+import {
+  LambdaRequestId,
+  mightExtractRequestIds,
+  RequestId,
+} from './mightExtractRequestIds';
+import {
+  createValidationErrorResponse,
+  ValidationErrorResponse,
+} from './validationErrorResponse';
 
 type LgtmImage = { id: string; url: string };
 
@@ -27,19 +36,21 @@ type Dto = {
 
 type SuccessResponse = {
   lgtmImages: LgtmImages;
-  xRequestId?: string;
-  xLambdaRequestId?: string;
+  xRequestId?: RequestId;
+  xLambdaRequestId?: LambdaRequestId;
 };
 
 type FailureResponse = {
   error: Error;
-  xRequestId?: string;
-  xLambdaRequestId?: string;
+  xRequestId?: RequestId;
+  xLambdaRequestId?: LambdaRequestId;
 };
 
 export const fetchLgtmImagesInRandom = async (
   dto: Dto
-): Promise<Result<SuccessResponse, FailureResponse>> => {
+): Promise<
+  Result<SuccessResponse, FailureResponse | ValidationErrorResponse>
+> => {
   const options = {
     method: 'GET',
     headers: {
@@ -53,19 +64,12 @@ export const fetchLgtmImagesInRandom = async (
       error: new Error('failed to fetchLgtmImagesInRandom'),
     };
 
-    if (response.headers.get('x-request-id') != null) {
-      failureResponse.xRequestId = response.headers.get(
-        'x-request-id'
-      ) as string;
-    }
+    const requestIds = mightExtractRequestIds(response);
 
-    if (response.headers.get('x-lambda-request-id') != null) {
-      failureResponse.xLambdaRequestId = response.headers.get(
-        'x-lambda-request-id'
-      ) as string;
-    }
-
-    return createFailureResult<FailureResponse>(failureResponse);
+    return createFailureResult<FailureResponse>({
+      ...failureResponse,
+      ...requestIds,
+    });
   }
 
   const responseBody = await response.json();
@@ -75,35 +79,29 @@ export const fetchLgtmImagesInRandom = async (
       lgtmImages: responseBody,
     };
 
-    if (response.headers.get('x-request-id') != null) {
-      successResponse.xRequestId = response.headers.get(
-        'x-request-id'
-      ) as string;
-    }
+    const requestIds = mightExtractRequestIds(response);
 
-    if (response.headers.get('x-lambda-request-id') != null) {
-      successResponse.xLambdaRequestId = response.headers.get(
-        'x-lambda-request-id'
-      ) as string;
-    }
-
-    return createSuccessResult<SuccessResponse>(successResponse);
+    return createSuccessResult<SuccessResponse>({
+      ...successResponse,
+      ...requestIds,
+    });
   }
 
-  // TODO 後でバリデーション専用のエラーレスポンスを返すようにする
+  const validationResult = validation(lgtmImagesSchema, responseBody);
+  if (!validationResult.isValidate && validationResult.invalidParams != null) {
+    return createFailureResult<ValidationErrorResponse>(
+      createValidationErrorResponse(validationResult.invalidParams, response)
+    );
+  }
+
   const failureResponse: FailureResponse = {
     error: new Error('response body is invalid'),
   };
 
-  if (response.headers.get('x-request-id') != null) {
-    failureResponse.xRequestId = response.headers.get('x-request-id') as string;
-  }
+  const requestIds = mightExtractRequestIds(response);
 
-  if (response.headers.get('x-lambda-request-id') != null) {
-    failureResponse.xLambdaRequestId = response.headers.get(
-      'x-lambda-request-id'
-    ) as string;
-  }
-
-  return createFailureResult<FailureResponse>(failureResponse);
+  return createFailureResult<FailureResponse>({
+    ...failureResponse,
+    ...requestIds,
+  });
 };
