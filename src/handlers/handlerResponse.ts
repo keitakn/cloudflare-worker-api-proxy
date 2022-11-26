@@ -24,10 +24,10 @@ export type ProblemDetails = {
   detail?: string;
 };
 
-export type ValidationProblemDetails = ProblemDetails & {
+export type ValidationProblemDetails = {
   title: 'unprocessable entity';
   type: 'ValidationError';
-  status: typeof httpStatusCode.unprocessableEntity;
+  status: HttpStatusCode;
   invalidParams: InvalidParams;
 };
 
@@ -41,7 +41,7 @@ export const createValidationErrorResponse = (
   invalidParams: InvalidParams,
   headers: ResponseHeader = { 'Content-Type': 'application/json' }
 ): Response => {
-  const validationProblemDetails = {
+  const validationProblemDetails: ValidationProblemDetails = {
     title: 'unprocessable entity',
     type: 'ValidationError',
     status: httpStatusCode.unprocessableEntity,

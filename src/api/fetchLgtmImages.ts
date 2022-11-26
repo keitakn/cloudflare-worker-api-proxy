@@ -1,6 +1,9 @@
-import { z } from 'zod';
+import type { LgtmImage } from '../lgtmImage';
 import { createFailureResult, createSuccessResult, Result } from '../result';
-import { validation } from '../validator';
+import {
+  isFetchLgtmImagesResponseBody,
+  validateFetchLgtmImagesResponseBody,
+} from './fetchLgtmImagesResponse';
 import { JwtAccessToken } from './issueAccessToken';
 import {
   LambdaRequestId,
@@ -12,30 +15,13 @@ import {
   ValidationErrorResponse,
 } from './validationErrorResponse';
 
-type LgtmImage = { id: string; url: string };
-
-type LgtmImages = LgtmImage[];
-
-const lgtmImageSchema = z.object({
-  id: z.union([z.string().min(1), z.number().min(1)]),
-  url: z.string().url(),
-});
-
-const lgtmImagesSchema = z.object({
-  lgtmImages: z.array(lgtmImageSchema),
-});
-
-const isLgtmImages = (value: unknown): value is LgtmImages => {
-  return validation(lgtmImagesSchema, value).isValidate;
-};
-
 type Dto = {
   apiBaseUrl: string;
   accessToken: JwtAccessToken;
 };
 
 type SuccessResponse = {
-  lgtmImages: LgtmImages;
+  lgtmImages: LgtmImage[];
   xRequestId?: RequestId;
   xLambdaRequestId?: LambdaRequestId;
 };
@@ -73,10 +59,11 @@ export const fetchLgtmImagesInRandom = async (
   }
 
   const responseBody = await response.json();
-  if (isLgtmImages(responseBody)) {
-    // TODO idはnumber型で返すように変更する
+  if (isFetchLgtmImagesResponseBody(responseBody)) {
     const successResponse: SuccessResponse = {
-      lgtmImages: responseBody,
+      lgtmImages: responseBody.lgtmImages.map((value) => {
+        return { id: Number(value.id), imageUrl: value.url };
+      }),
     };
 
     const requestIds = mightExtractRequestIds(response);
@@ -87,7 +74,7 @@ export const fetchLgtmImagesInRandom = async (
     });
   }
 
-  const validationResult = validation(lgtmImagesSchema, responseBody);
+  const validationResult = validateFetchLgtmImagesResponseBody(responseBody);
   if (!validationResult.isValidate && validationResult.invalidParams != null) {
     return createFailureResult<ValidationErrorResponse>(
       createValidationErrorResponse(validationResult.invalidParams, response)

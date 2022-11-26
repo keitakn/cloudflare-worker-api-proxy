@@ -2,9 +2,9 @@ import { ResponseResolver, MockedRequest, restContext } from 'msw';
 
 import { httpStatusCode } from '../../httpStatusCode';
 
-import fetchLgtmImagesMockBody from './fetchLgtmImagesMockBody';
+import { fetchLgtmImagesMockBody } from './fetchLgtmImagesMockBody';
 
-const mockFetchLgtmImages: ResponseResolver<
+export const mockFetchLgtmImages: ResponseResolver<
   MockedRequest,
   typeof restContext
 > = (_req, res, ctx) =>
@@ -15,5 +15,3 @@ const mockFetchLgtmImages: ResponseResolver<
     ctx.set('X-lambda-request-Id', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'),
     ctx.json(fetchLgtmImagesMockBody)
   );
-
-export default mockFetchLgtmImages;
