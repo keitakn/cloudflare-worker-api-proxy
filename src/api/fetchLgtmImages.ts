@@ -1,6 +1,8 @@
-import { z } from 'zod';
 import { createFailureResult, createSuccessResult, Result } from '../result';
-import { validation } from '../validator';
+import {
+  isFetchLgtmImagesResponseBody,
+  validateFetchLgtmImagesResponseBody,
+} from './fetchLgtmImagesResponse';
 import { JwtAccessToken } from './issueAccessToken';
 import {
   LambdaRequestId,
@@ -15,19 +17,6 @@ import {
 type LgtmImage = { id: string; url: string };
 
 type LgtmImages = LgtmImage[];
-
-const lgtmImageSchema = z.object({
-  id: z.union([z.string().min(1), z.number().min(1)]),
-  url: z.string().url(),
-});
-
-const lgtmImagesSchema = z.object({
-  lgtmImages: z.array(lgtmImageSchema),
-});
-
-const isLgtmImages = (value: unknown): value is LgtmImages => {
-  return validation(lgtmImagesSchema, value).isValidate;
-};
 
 type Dto = {
   apiBaseUrl: string;
@@ -73,7 +62,7 @@ export const fetchLgtmImagesInRandom = async (
   }
 
   const responseBody = await response.json();
-  if (isLgtmImages(responseBody)) {
+  if (isFetchLgtmImagesResponseBody(responseBody)) {
     // TODO idはnumber型で返すように変更する
     const successResponse: SuccessResponse = {
       lgtmImages: responseBody,
@@ -87,7 +76,7 @@ export const fetchLgtmImagesInRandom = async (
     });
   }
 
-  const validationResult = validation(lgtmImagesSchema, responseBody);
+  const validationResult = validateFetchLgtmImagesResponseBody(responseBody);
   if (!validationResult.isValidate && validationResult.invalidParams != null) {
     return createFailureResult<ValidationErrorResponse>(
       createValidationErrorResponse(validationResult.invalidParams, response)
