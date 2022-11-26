@@ -84,7 +84,7 @@ export const handleFetchLgtmImagesInRandom = async (
     );
   }
 
-  const responseBody = fetchLgtmImagesResult.value.lgtmImages;
+  const responseBody = { lgtmImages: fetchLgtmImagesResult.value.lgtmImages };
 
   return createSuccessResponse(responseBody, httpStatusCode.ok, headers);
 };
