@@ -1,10 +1,12 @@
 import { z } from 'zod';
 import { validation, ValidationResult } from '../validator';
 
-type FetchLgtmImagesResponseBody = Array<{
-  id: string;
-  url: `https://${string}`;
-}>;
+type FetchLgtmImagesResponseBody = {
+  lgtmImages: Array<{
+    id: string;
+    url: `https://${string}`;
+  }>;
+};
 
 const lgtmImageSchema = z.object({
   id: z.union([z.string().min(1), z.number().min(1)]),

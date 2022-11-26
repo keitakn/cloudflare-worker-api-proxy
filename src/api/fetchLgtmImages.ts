@@ -1,3 +1,4 @@
+import type { LgtmImage } from '../lgtmImage';
 import { createFailureResult, createSuccessResult, Result } from '../result';
 import {
   isFetchLgtmImagesResponseBody,
@@ -14,17 +15,13 @@ import {
   ValidationErrorResponse,
 } from './validationErrorResponse';
 
-type LgtmImage = { id: string; url: string };
-
-type LgtmImages = LgtmImage[];
-
 type Dto = {
   apiBaseUrl: string;
   accessToken: JwtAccessToken;
 };
 
 type SuccessResponse = {
-  lgtmImages: LgtmImages;
+  lgtmImages: LgtmImage[];
   xRequestId?: RequestId;
   xLambdaRequestId?: LambdaRequestId;
 };
@@ -63,9 +60,10 @@ export const fetchLgtmImagesInRandom = async (
 
   const responseBody = await response.json();
   if (isFetchLgtmImagesResponseBody(responseBody)) {
-    // TODO idはnumber型で返すように変更する
     const successResponse: SuccessResponse = {
-      lgtmImages: responseBody,
+      lgtmImages: responseBody.lgtmImages.map((value) => {
+        return { id: Number(value.id), imageUrl: value.url };
+      }),
     };
 
     const requestIds = mightExtractRequestIds(response);
