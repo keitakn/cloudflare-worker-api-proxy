@@ -4,8 +4,8 @@
 import 'whatwg-fetch';
 import { rest } from 'msw';
 import { setupServer } from 'msw/node';
-import mockInternalServerError from '../../mocks/api/error/mockInternalServerError';
-import mockFetchLgtmImages from '../../mocks/api/mockFetchLgtmImages';
+import { mockInternalServerError } from '../../mocks/api/error/mockInternalServerError';
+import { mockFetchLgtmImages } from '../../mocks/api/mockFetchLgtmImages';
 import { mockFetchLgtmImagesUnknownResponse } from '../../mocks/api/mockFetchLgtmImagesUnknownResponse';
 import { isSuccessResult } from '../../result';
 import { fetchLgtmImagesInRandom } from '../fetchLgtmImages';

@@ -2,7 +2,7 @@ import { ResponseResolver, MockedRequest, restContext } from 'msw';
 
 import { httpStatusCode } from '../../../httpStatusCode';
 
-const mockInternalServerError: ResponseResolver<
+export const mockInternalServerError: ResponseResolver<
   MockedRequest,
   typeof restContext
 > = (req, res, ctx) =>
@@ -15,5 +15,3 @@ const mockInternalServerError: ResponseResolver<
       message: 'Internal Server Error',
     })
   );
-
-export default mockInternalServerError;
