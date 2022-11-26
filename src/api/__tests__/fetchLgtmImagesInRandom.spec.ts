@@ -8,6 +8,7 @@ import { setupServer } from 'msw/node';
 import mockInternalServerError from '../../mocks/api/error/mockInternalServerError';
 import fetchLgtmImagesMockBody from '../../mocks/api/fetchLgtmImagesMockBody';
 import mockFetchLgtmImages from '../../mocks/api/mockFetchLgtmImages';
+import { mockFetchLgtmImagesUnknownResponse } from '../../mocks/api/mockFetchLgtmImagesUnknownResponse';
 import { isSuccessResult } from '../../result';
 import { fetchLgtmImagesInRandom } from '../fetchLgtmImages';
 
@@ -58,6 +59,31 @@ describe('fetchLgtmImagesInRandom TestCases', () => {
 
     const expected = {
       error: new Error('failed to fetchLgtmImagesInRandom'),
+      xRequestId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
+      xLambdaRequestId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
+    };
+
+    expect(isSuccessResult(lgtmImagesResult)).toBeFalsy();
+    expect(lgtmImagesResult.value).toStrictEqual(expected);
+  });
+
+  it('should return a FailureResponse because the API Response type is different', async () => {
+    mockServer.use(
+      rest.get(`${apiUrl}/lgtm-images`, mockFetchLgtmImagesUnknownResponse)
+    );
+
+    const lgtmImagesResult = await fetchLgtmImagesInRandom({
+      apiBaseUrl: apiUrl,
+      accessToken: '',
+    });
+
+    const expected = {
+      invalidParams: [
+        { name: 'lgtmImages', reason: 'Invalid input' },
+        { name: 'lgtmImages', reason: 'Invalid url' },
+        { name: 'lgtmImages', reason: 'Invalid input' },
+        { name: 'lgtmImages', reason: 'Invalid url' },
+      ],
       xRequestId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
       xLambdaRequestId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
     };
