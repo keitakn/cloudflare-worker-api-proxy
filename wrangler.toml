@@ -1,3 +1,6 @@
 name = "cloudflare-worker-api-proxy"
 main = "src/index.ts"
 compatibility_date = "2022-05-21"
+kv_namespaces = [
+  { binding = "COGNITO_TOKEN", id = "ae13471aae89415ea11b969959910c2e", preview_id = "6dd9ad13fee34440aa96284e79693c40" }
+]

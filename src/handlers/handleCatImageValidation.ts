@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { CacheClient } from '../api/cacheClient';
 import { isAcceptableCatImage } from '../api/isAcceptableCatImage';
 import { issueAccessToken } from '../api/issueAccessToken';
 import { isValidationErrorResponse } from '../api/validationErrorResponse';
@@ -20,6 +21,7 @@ type Dto = {
     cognitoClientId: string;
     cognitoClientSecret: string;
     apiBaseUrl: string;
+    cacheClient: CacheClient;
   };
   requestBody: {
     image: string;
@@ -43,6 +45,7 @@ export const handleCatImageValidation = async (dto: Dto): Promise<Response> => {
     endpoint: dto.env.cognitoTokenEndpoint,
     cognitoClientId: dto.env.cognitoClientId,
     cognitoClientSecret: dto.env.cognitoClientSecret,
+    cacheClient: dto.env.cacheClient,
   };
 
   const issueAccessTokenResult = await issueAccessToken(issueTokenRequest);

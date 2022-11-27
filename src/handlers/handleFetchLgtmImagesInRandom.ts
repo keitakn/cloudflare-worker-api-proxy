@@ -1,3 +1,4 @@
+import type { CacheClient } from '../api/cacheClient';
 import { fetchLgtmImagesInRandom } from '../api/fetchLgtmImages';
 import { issueAccessToken } from '../api/issueAccessToken';
 import { isValidationErrorResponse } from '../api/validationErrorResponse';
@@ -16,6 +17,7 @@ type Dto = {
     cognitoClientId: string;
     cognitoClientSecret: string;
     apiBaseUrl: string;
+    cacheClient: CacheClient;
   };
 };
 
@@ -26,6 +28,7 @@ export const handleFetchLgtmImagesInRandom = async (
     endpoint: dto.env.cognitoTokenEndpoint,
     cognitoClientId: dto.env.cognitoClientId,
     cognitoClientSecret: dto.env.cognitoClientSecret,
+    cacheClient: dto.env.cacheClient,
   };
 
   const issueAccessTokenResult = await issueAccessToken(issueTokenRequest);

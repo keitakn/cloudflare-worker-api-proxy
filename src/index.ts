@@ -18,6 +18,7 @@ app.get('/lgtm-images', async (c) => {
       cognitoClientId: c.env.COGNITO_CLIENT_ID,
       cognitoClientSecret: c.env.COGNITO_CLIENT_SECRET,
       apiBaseUrl: c.env.LGTMEOW_API_URL,
+      cacheClient: c.env.COGNITO_TOKEN,
     },
   });
 });
@@ -28,6 +29,7 @@ app.post('/cat-images/validation-results', async (c) => {
     cognitoClientId: c.env.COGNITO_CLIENT_ID,
     cognitoClientSecret: c.env.COGNITO_CLIENT_SECRET,
     apiBaseUrl: c.env.IMAGE_RECOGNITION_API_URL,
+    cacheClient: c.env.COGNITO_TOKEN,
   };
 
   const requestBody = await c.req.json<{
