@@ -4,4 +4,5 @@ export type Bindings = {
   COGNITO_TOKEN_ENDPOINT: string;
   IMAGE_RECOGNITION_API_URL: string;
   LGTMEOW_API_URL: string;
+  COGNITO_TOKEN: KVNamespace;
 };
