@@ -26,8 +26,9 @@
   },
   "private": true,
   "scripts": {
-    "start": "wrangler dev",
-    "publish": "wrangler publish",
+    "start": "wrangler dev --env staging",
+    "deploy:production": "wrangler publish",
+    "deploy:staging": "wrangler publish --env staging",
     "lint:prettier": "prettier --check .",
     "fix:prettier": "npm run lint:prettier -- --write",
     "lint:eslint": "eslint .",
