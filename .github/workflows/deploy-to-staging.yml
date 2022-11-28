@@ -13,16 +13,15 @@ jobs:
       matrix:
         node-version: [18.x]
     steps:
-    - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
-      with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - uses: actions/checkout@v2
-    - name: Publish
-      uses: cloudflare/wrangler-action@2.0.0
-      with:
-        apiToken: ${{ secrets.CF_API_TOKEN }}
-        environment: "staging"
+      - uses: actions/checkout@v3
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      - run: npm ci
+      - uses: cloudflare/wrangler-action@2.0.0
+        name: Publish to staging
+        with:
+          apiToken: ${{ secrets.CF_API_TOKEN }}
+          environment: 'staging'
