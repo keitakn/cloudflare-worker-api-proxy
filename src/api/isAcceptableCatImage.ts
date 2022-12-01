@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { createFailureResult, createSuccessResult, Result } from '../result';
 import { validation } from '../validator';
+import { IsAcceptableCatImageError } from './errors/IsAcceptableCatImageError';
 import type { JwtAccessToken } from './issueAccessToken';
 import {
   LambdaRequestId,
@@ -79,16 +80,13 @@ export const isAcceptableCatImage = async (
   );
 
   if (!response.ok) {
-    const failureResponse: FailureResponse = {
-      error: new Error('failed to isAcceptableCatImage'),
-    };
-
     const requestIds = mightExtractRequestIds(response);
 
-    return createFailureResult<FailureResponse>({
-      ...failureResponse,
-      ...requestIds,
-    });
+    throw new IsAcceptableCatImageError(
+      `X-Request-Id=${String(
+        requestIds.xRequestId
+      )}:X-Lambda-Request-Id:${String(requestIds.xLambdaRequestId)}`
+    );
   }
 
   const responseBody = await response.json();
@@ -116,14 +114,11 @@ export const isAcceptableCatImage = async (
     );
   }
 
-  const failureResponse: FailureResponse = {
-    error: new Error('response body is invalid'),
-  };
-
   const requestIds = mightExtractRequestIds(response);
 
-  return createFailureResult<FailureResponse>({
-    ...failureResponse,
-    ...requestIds,
-  });
+  throw new IsAcceptableCatImageError(
+    `X-Request-Id=${String(requestIds.xRequestId)}:X-Lambda-Request-Id:${String(
+      requestIds.xLambdaRequestId
+    )}`
+  );
 };
