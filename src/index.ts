@@ -1,3 +1,4 @@
+import { getSentry, sentry } from '@honojs/sentry';
 import { Hono } from 'hono';
 import { Bindings } from './bindings';
 import {
@@ -6,10 +7,21 @@ import {
 } from './handlers/handleCatImageValidation';
 import { handleFetchLgtmImagesInRandom } from './handlers/handleFetchLgtmImagesInRandom';
 import { handleNotFound } from './handlers/handleNotFound';
-import { createValidationErrorResponse } from './handlers/handlerResponse';
+import {
+  createValidationErrorResponse,
+  ProblemDetails,
+} from './handlers/handlerResponse';
+import { httpStatusCode } from './httpStatusCode';
 import { AcceptedTypesImageExtension } from './lgtmImage';
 
 const app = new Hono<{ Bindings: Bindings }>();
+
+app.use(
+  '*',
+  sentry({
+    dsn: 'https://42809d9efa8849f88f0136ced7917950@o1223117.ingest.sentry.io/4504248714330112',
+  })
+);
 
 app.get('/lgtm-images', async (c) => {
   return await handleFetchLgtmImagesInRandom({
@@ -44,6 +56,21 @@ app.post('/cat-images/validation-results', async (c) => {
   }
 
   return await handleCatImageValidation({ env, requestBody });
+});
+
+app.onError((error, c) => {
+  const problemDetails: ProblemDetails = {
+    title: error.name,
+    type: 'InternalServerError',
+    status: httpStatusCode.internalServerError,
+  } as const;
+
+  const $sentry = getSentry(c);
+  $sentry.setTag('requestIds', error.message);
+  $sentry.setTag('environment', c.env.APP_ENV);
+  $sentry.captureException(error);
+
+  return c.json(problemDetails, httpStatusCode.internalServerError);
 });
 
 app.all('*', (c) => {

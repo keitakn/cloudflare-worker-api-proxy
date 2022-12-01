@@ -1,4 +1,5 @@
 export type Bindings = {
+  APP_ENV: string;
   COGNITO_CLIENT_ID: string;
   COGNITO_CLIENT_SECRET: string;
   COGNITO_TOKEN_ENDPOINT: string;
