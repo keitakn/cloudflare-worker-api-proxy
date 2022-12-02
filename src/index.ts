@@ -1,5 +1,6 @@
 import { getSentry, sentry } from '@honojs/sentry';
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import { Bindings } from './bindings';
 import {
   handleCatImageValidation,
@@ -22,6 +23,12 @@ app.use(
     dsn: 'https://42809d9efa8849f88f0136ced7917950@o1223117.ingest.sentry.io/4504248714330112',
   })
 );
+
+app.use('*', async (c, next) => {
+  const handler = cors({ origin: ['http://localhost:2222'] });
+
+  await handler(c, next);
+});
 
 app.get('/lgtm-images', async (c) => {
   return await handleFetchLgtmImagesInRandom({
