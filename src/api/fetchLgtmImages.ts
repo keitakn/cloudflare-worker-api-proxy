@@ -1,5 +1,6 @@
 import type { LgtmImage } from '../lgtmImage';
 import { createFailureResult, createSuccessResult, Result } from '../result';
+import { FetchLgtmImagesInRandomError } from './errors/FetchLgtmImagesInRandomError';
 import {
   isFetchLgtmImagesResponseBody,
   validateFetchLgtmImagesResponseBody,
@@ -46,16 +47,13 @@ export const fetchLgtmImagesInRandom = async (
 
   const response = await fetch(`${dto.apiBaseUrl}/lgtm-images`, options);
   if (!response.ok) {
-    const failureResponse: FailureResponse = {
-      error: new Error('failed to fetchLgtmImagesInRandom'),
-    };
-
     const requestIds = mightExtractRequestIds(response);
 
-    return createFailureResult<FailureResponse>({
-      ...failureResponse,
-      ...requestIds,
-    });
+    throw new FetchLgtmImagesInRandomError(
+      `X-Request-Id=${String(
+        requestIds.xRequestId
+      )}:X-Lambda-Request-Id:${String(requestIds.xLambdaRequestId)}`
+    );
   }
 
   const responseBody = await response.json();
@@ -81,14 +79,11 @@ export const fetchLgtmImagesInRandom = async (
     );
   }
 
-  const failureResponse: FailureResponse = {
-    error: new Error('response body is invalid'),
-  };
-
   const requestIds = mightExtractRequestIds(response);
 
-  return createFailureResult<FailureResponse>({
-    ...failureResponse,
-    ...requestIds,
-  });
+  throw new FetchLgtmImagesInRandomError(
+    `X-Request-Id=${String(requestIds.xRequestId)}:X-Lambda-Request-Id:${String(
+      requestIds.xLambdaRequestId
+    )}`
+  );
 };

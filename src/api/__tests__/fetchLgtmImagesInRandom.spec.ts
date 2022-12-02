@@ -8,6 +8,7 @@ import { mockInternalServerError } from '../../mocks/api/error/mockInternalServe
 import { mockFetchLgtmImages } from '../../mocks/api/mockFetchLgtmImages';
 import { mockFetchLgtmImagesUnknownResponse } from '../../mocks/api/mockFetchLgtmImagesUnknownResponse';
 import { isSuccessResult } from '../../result';
+import { FetchLgtmImagesInRandomError } from '../errors/FetchLgtmImagesInRandomError';
 import { fetchLgtmImagesInRandom } from '../fetchLgtmImages';
 
 const apiUrl = 'https://api.example.com';
@@ -95,22 +96,16 @@ describe('fetchLgtmImagesInRandom TestCases', () => {
     expect(lgtmImagesResult.value).toStrictEqual(expected);
   });
 
-  it('should return a FailureResponse because the API returns an Error', async () => {
+  it('should Throw FetchLgtmImagesInRandomError because the API returns an Error', async () => {
     mockServer.use(rest.get(`${apiUrl}/lgtm-images`, mockInternalServerError));
 
-    const lgtmImagesResult = await fetchLgtmImagesInRandom({
-      apiBaseUrl: apiUrl,
-      accessToken: '',
-    });
-
-    const expected = {
-      error: new Error('failed to fetchLgtmImagesInRandom'),
-      xRequestId: 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa',
-      xLambdaRequestId: 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb',
-    };
-
-    expect(isSuccessResult(lgtmImagesResult)).toBeFalsy();
-    expect(lgtmImagesResult.value).toStrictEqual(expected);
+    await expect(
+      fetchLgtmImagesInRandom({ apiBaseUrl: apiUrl, accessToken: '' })
+    ).rejects.toStrictEqual(
+      new FetchLgtmImagesInRandomError(
+        'X-Request-Id=aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa:X-Lambda-Request-Id:bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb'
+      )
+    );
   });
 
   it('should return a FailureResponse because the API Response type is different', async () => {
