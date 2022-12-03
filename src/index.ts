@@ -26,9 +26,9 @@ app.use(
 
 app.use('*', async (c, next) => {
   const handler =
-    c.env.APP_ENV === 'staging'
-      ? cors()
-      : cors({ origin: 'https://lgtmeow.com' });
+    c.env.APP_ENV === 'production'
+      ? cors({ origin: 'https://lgtmeow.com' })
+      : cors();
 
   await handler(c, next);
 });
