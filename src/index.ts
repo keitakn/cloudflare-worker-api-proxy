@@ -17,12 +17,11 @@ import { AcceptedTypesImageExtension } from './lgtmImage';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
-app.use(
-  '*',
-  sentry({
-    dsn: 'https://42809d9efa8849f88f0136ced7917950@o1223117.ingest.sentry.io/4504248714330112',
-  })
-);
+app.use('*', async (c, next) => {
+  const handler = sentry({ dsn: c.env.SENTRY_DSN });
+
+  await handler(c, next);
+});
 
 app.use('*', async (c, next) => {
   const handler =
@@ -75,10 +74,10 @@ app.onError((error, c) => {
     status: httpStatusCode.internalServerError,
   } as const;
 
-  const $sentry = getSentry(c);
-  $sentry.setTag('requestIds', error.message);
-  $sentry.setTag('environment', c.env.APP_ENV);
-  $sentry.captureException(error);
+  const sentryHandler = getSentry(c);
+  sentryHandler.setTag('requestIds', error.message);
+  sentryHandler.setTag('environment', c.env.APP_ENV);
+  sentryHandler.captureException(error);
 
   return c.json(problemDetails, httpStatusCode.internalServerError);
 });
