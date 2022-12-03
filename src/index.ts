@@ -74,10 +74,10 @@ app.onError((error, c) => {
     status: httpStatusCode.internalServerError,
   } as const;
 
-  const $sentry = getSentry(c);
-  $sentry.setTag('requestIds', error.message);
-  $sentry.setTag('environment', c.env.APP_ENV);
-  $sentry.captureException(error);
+  const sentryHandler = getSentry(c);
+  sentryHandler.setTag('requestIds', error.message);
+  sentryHandler.setTag('environment', c.env.APP_ENV);
+  sentryHandler.captureException(error);
 
   return c.json(problemDetails, httpStatusCode.internalServerError);
 });
