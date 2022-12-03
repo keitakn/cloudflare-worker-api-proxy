@@ -17,12 +17,11 @@ import { AcceptedTypesImageExtension } from './lgtmImage';
 
 const app = new Hono<{ Bindings: Bindings }>();
 
-app.use(
-  '*',
-  sentry({
-    dsn: 'https://42809d9efa8849f88f0136ced7917950@o1223117.ingest.sentry.io/4504248714330112',
-  })
-);
+app.use('*', async (c, next) => {
+  const handler = sentry({ dsn: c.env.SENTRY_DSN });
+
+  await handler(c, next);
+});
 
 app.use('*', async (c, next) => {
   const handler =
