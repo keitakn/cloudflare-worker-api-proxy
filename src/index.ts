@@ -25,7 +25,10 @@ app.use(
 );
 
 app.use('*', async (c, next) => {
-  const handler = cors({ origin: ['http://localhost:2222'] });
+  const handler =
+    c.env.APP_ENV === 'staging'
+      ? cors()
+      : cors({ origin: 'https://lgtmeow.com' });
 
   await handler(c, next);
 });
